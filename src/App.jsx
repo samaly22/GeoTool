@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import Sidebar from './components/sidebar'
 import AttributesTable from './components/attributesTable'
 import { fetchFeatures } from './services/wfs.js'
+import CollapsiblePanel from './components/collapsiblePanel'
 
 function App() {
     const [selectedFeature, setSelectedFeature] = useState(null)
@@ -57,7 +58,9 @@ function App() {
                 {geoData && <GeoJSON key={JSON.stringify(geoData)} data={geoData} />}
                 <MapController selectedFeature={selectedFeature} />
             </MapContainer>
-            <AttributesTable geoJson={geoData} handleOnClick={handleFeatureClick} />
+            <CollapsiblePanel>
+                <AttributesTable geoJson={geoData} handleOnClick={handleFeatureClick} />
+            </CollapsiblePanel>
         </div>    
     )
     

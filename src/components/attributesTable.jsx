@@ -4,20 +4,19 @@ function AttributesTable({ geoJson, handleOnClick }) {
     }
 
     return (
-        <div style={{ width: '300px', padding: '1rem', overflowY: 'auto', background: '#f4f4f4' }}>
+        <div style={{ width: 'auto', padding: '1rem', overflowY: 'auto', background: '#f4f4f4' }}>
             <h2>Übersicht</h2>
             {geoJson.features.map((feature, index) =>
                 <div key={index}
                     onClick={() => {
                         console.log('Klick')
                         handleOnClick(feature)}}
-                    style={{ marginbottom: '0.75rem',
-                                        background: '#ffffff',
-                                        padding: '0.75rem',
-                                        background: '#f4f4f4',
-                                        border: '1px solid #ddd',
-                                        borderRadius: '6px',
-                                        boxShadow: '0 1px 3px rgba(0,0,0,0.08'}}>
+                    style={{ marginBottom: '0.75rem',
+                                padding: '0.75rem',
+                                background: '#f4f4f4',
+                                border: '1px solid #ddd',
+                                borderRadius: '6px',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.08'}}>
                     <table>
                         <thead>
                             <tr>
