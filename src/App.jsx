@@ -30,6 +30,7 @@ function App() {
         // console.log('Gewählter Layer:', layer)
     }
 
+<<<<<<< HEAD
     function MapController({ selectedFeature, selectedLayer, setSelectedFeature, setSelectedLayer, geoData, setVisibleFeatures }) {
         const map = useMap()
 
@@ -80,6 +81,16 @@ function App() {
         if (filterableFIDs.includes(id)) {
             setFilterableFIDs(filterableFIDs.filter(f => f !== id))
         } else setFilterableFIDs([...filterableFIDs, id])
+=======
+    function MapController({ selectedFeature }) {
+        if (!selectedFeature) return null
+        const map = useMap()
+        const [lng, lat] = selectedFeature.geometry.coordinates
+        //console.log([lng, lat])
+        map.flyTo([lat, lng], 12)
+        map.invalidateSize()
+        return null
+>>>>>>> 6be2e73 (added mouseover functionality on leaflet map)
     }
 
     function handleFeatureClick(feature) {
@@ -89,6 +100,7 @@ function App() {
     function onEachFeature(feature, layer) {
         if (feature) {
             layer.bindTooltip(feature.properties.NAME)
+<<<<<<< HEAD
             const popupContent = `
                 <div>
                     <table>
@@ -99,6 +111,9 @@ function App() {
                 </div>`
             //console.log(Obeject.entries(feature.properties))
             layer.bindPopup(popupContent)
+=======
+
+>>>>>>> 6be2e73 (added mouseover functionality on leaflet map)
         }
         layer.on({
             mouseover: (e) => setHoveredFeature(feature),
@@ -120,6 +135,7 @@ function App() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution="© OpenStreetMap contributors"
                 />
+<<<<<<< HEAD
                 {geoData && <GeoJSON key={JSON.stringify(displayedFeatures)} data={displayedFeatures} onEachFeature={onEachFeature} />}
                 <MapController selectedFeature={selectedFeature}
                                 selectedLayer={selectedLayer}
@@ -127,6 +143,10 @@ function App() {
                                 setSelectedLayer={setSelectedLayer} 
                                 geoData={geoData}
                                 setVisibleFeatures={setVisibleFeatures} />
+=======
+                {geoData && <GeoJSON key={JSON.stringify(geoData)} data={geoData} onEachFeature={onEachFeature} />}
+                <MapController selectedFeature={selectedFeature} />
+>>>>>>> 6be2e73 (added mouseover functionality on leaflet map)
             </MapContainer>
             <CollapsiblePanel>
                 <AttributesTable features={displayedFeatures} handleOnClick={handleFeatureClick} filterableFIDs={filterableFIDs} setFilterableFIDs={setFilterableFIDs} isFiltered={isFiltered} setIsFiltered={setIsFiltered} change={change} selectAll={selectAll}/>
