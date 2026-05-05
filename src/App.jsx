@@ -89,6 +89,7 @@ function App() {
         //console.log([lng, lat])
         map.flyTo([lat, lng], 12)
         map.invalidateSize()
+        setSelectedFeature(null)
         return null
 >>>>>>> 6be2e73 (added mouseover functionality on leaflet map)
     }
