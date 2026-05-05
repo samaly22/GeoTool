@@ -7,6 +7,7 @@ import CollapsiblePanel from './components/collapsiblePanel'
 import config from './config.json'
 
 function App() {
+    const [hoveredFeature, setHoveredFeature] = useState(null)
     const [selectedFeature, setSelectedFeature] = useState(null)
     const [selectedLayer, setSelectedLayer] = useState(null)
     const [visibleFeatures, setVisibleFeatures] = useState(null)
@@ -84,13 +85,18 @@ function App() {
         setSelectedFeature(feature)
     }
 
-    async function onEachFeature(feature, layer) {
-        layer.bindPopup(feature)
+    function onEachFeature(feature, layer) {
+        if (feature) {
+            layer.bindTooltip(feature.properties.NAME)
+
+        }
         layer.on({
             mouseover: (e) => setHoveredFeature(feature),
             mouseout: (e) => setHoveredFeature(null)
         })
     }
+
+    
 
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
@@ -104,7 +110,7 @@ function App() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution="© OpenStreetMap contributors"
                 />
-                {geoData && <GeoJSON key={JSON.stringify(displayedFeatures)} data={displayedFeatures} />}
+                {geoData && <GeoJSON key={JSON.stringify(displayedFeatures)} data={displayedFeatures} onEachFeature={onEachFeature} />}
                 <MapController selectedFeature={selectedFeature}
                                 selectedLayer={selectedLayer}
                                 setSelectedFeature={setSelectedFeature}
