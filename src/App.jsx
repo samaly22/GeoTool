@@ -88,7 +88,16 @@ function App() {
     function onEachFeature(feature, layer) {
         if (feature) {
             layer.bindTooltip(feature.properties.NAME)
-
+            const popupContent = `
+                <div>
+                    <table>
+                        ${Object.entries(feature.properties)
+                            .map(([key, value]) => `<tr><td><b>${key}</b></td><td>${value}</td></tr>`)
+                            .join('')}
+                    </table>
+                </div>`
+            //console.log(Obeject.entries(feature.properties))
+            layer.bindPopup(popupContent)
         }
         layer.on({
             mouseover: (e) => setHoveredFeature(feature),
