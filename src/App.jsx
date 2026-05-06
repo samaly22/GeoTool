@@ -7,11 +7,13 @@ import CollapsiblePanel from './components/collapsiblePanel'
 
 function App() {
     const [selectedFeature, setSelectedFeature] = useState(null)
+    const [selectedLayer, setSelectedLayer] = useState(null)
     const [geoData, setGeoData] = useState(null)
     const [wfsUrl, setWfsUrl] = useState('')
 
     async function handleLayerSelect(layer) {
         try {
+            setSelectedLayer(layer)
             const data = await fetchFeatures(wfsUrl, layer.name)
             setGeoData(data)
         } catch (e) {
@@ -20,14 +22,24 @@ function App() {
         // console.log('Gewählter Layer:', layer)
     }
 
-    function MapController({ selectedFeature }) {
-        console.log('selectedFeature: ', selectedFeature)
-        if (!selectedFeature) return null
+    function MapController({ selectedFeature, selectedLayer }) {
         const map = useMap()
+
+        // Zoomen bei Layerauswahl
+        if (!selectedLayer) return null
+        const lower = selectedLayer.boundingBox.lowerCorner.split(' ')
+        const upper = selectedLayer.boundingBox.upperCorner.split(' ')
+        map.fitBounds([[lower[1], lower[0]], [upper[1], upper[0]]], { animate: true, duration: 2 })
+        map.invalidateSize()
+        setSelectedLayer(null)
+
+        // Zoomen auf ausgewähltes Feature
+        if (!selectedFeature) return null
         const [lng, lat] = selectedFeature.geometry.coordinates
         console.log([lng, lat])
         map.flyTo([lat, lng], 12)
         map.invalidateSize()
+        setSelectedFeature(null)
         return null
     }
 
@@ -56,7 +68,7 @@ function App() {
                     attribution="© OpenStreetMap contributors"
                 />
                 {geoData && <GeoJSON key={JSON.stringify(geoData)} data={geoData} />}
-                <MapController selectedFeature={selectedFeature} />
+                <MapController selectedFeature={selectedFeature} selectedLayer={selectedLayer} />
             </MapContainer>
             <CollapsiblePanel>
                 <AttributesTable geoJson={geoData} handleOnClick={handleFeatureClick} />
