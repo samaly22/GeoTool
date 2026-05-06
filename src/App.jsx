@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet'
 import Sidebar from './components/sidebar'
 import AttributesTable from './components/attributesTable'
 import { fetchFeatures } from './services/wfs.js'
@@ -8,6 +8,7 @@ import CollapsiblePanel from './components/collapsiblePanel'
 function App() {
     const [selectedFeature, setSelectedFeature] = useState(null)
     const [selectedLayer, setSelectedLayer] = useState(null)
+    const [visibleFeatures, setVisibleFeatures] = useState(null)
     const [geoData, setGeoData] = useState(null)
     const [wfsUrl, setWfsUrl] = useState('')
 
@@ -16,14 +17,25 @@ function App() {
             setSelectedLayer(layer)
             const data = await fetchFeatures(wfsUrl, layer.name)
             setGeoData(data)
+            setVisibleFeatures(data.features)
         } catch (e) {
             console.error('Fehler beim Laden des Layers:', e)
         }
         // console.log('Gewählter Layer:', layer)
     }
 
-    function MapController({ selectedFeature, selectedLayer, setSelectedFeature, setSelectedLayer }) {
+    function MapController({ selectedFeature, selectedLayer, setSelectedFeature, setSelectedLayer, geoData, setVisibleFeatures }) {
         const map = useMap()
+
+        useMapEvents({
+            moveend: () => {
+                if (!geoData) return
+                const bounds = map.getBounds()
+                const features = geoData.features.filter(feature =>
+                    bounds.contains([feature.geometry.coordinates[1], feature.geometry.coordinates[0]])
+                )
+                setVisibleFeatures(features)
+        }})
 
         // Zoomen bei Layerauswahl
         useEffect(() => {
@@ -74,10 +86,15 @@ function App() {
                     attribution="© OpenStreetMap contributors"
                 />
                 {geoData && <GeoJSON key={JSON.stringify(geoData)} data={geoData} />}
-                <MapController selectedFeature={selectedFeature} selectedLayer={selectedLayer} setSelectedFeature={setSelectedFeature} setSelectedLayer={setSelectedLayer}/>
+                <MapController selectedFeature={selectedFeature}
+                                selectedLayer={selectedLayer}
+                                setSelectedFeature={setSelectedFeature}
+                                setSelectedLayer={setSelectedLayer} 
+                                geoData={geoData}
+                                setVisibleFeatures={setVisibleFeatures} />
             </MapContainer>
             <CollapsiblePanel>
-                <AttributesTable geoJson={geoData} handleOnClick={handleFeatureClick} />
+                <AttributesTable features={visibleFeatures} handleOnClick={handleFeatureClick} />
             </CollapsiblePanel>
         </div>    
     )

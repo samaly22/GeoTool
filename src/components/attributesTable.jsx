@@ -1,12 +1,12 @@
-function AttributesTable({ geoJson, handleOnClick }) {
-    if (!geoJson) {
+function AttributesTable({ features, handleOnClick }) {
+    if (!features) {
         return null
     }
 
     return (
-        <div style={{ width: 'auto', padding: '1rem', overflowY: 'auto', background: '#f4f4f4' }}>
+        <div style={{ width: 'auto', height: '100vh', padding: '1rem', overflowY: 'auto', background: '#f4f4f4' }}>
             <h2>Übersicht</h2>
-            {geoJson.features.map((feature, index) =>
+            {features.map((feature, index) =>
                 <div key={index}
                     onClick={() => {
                         console.log('Klick')
