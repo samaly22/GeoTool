@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import Sidebar from './components/sidebar'
 import AttributesTable from './components/attributesTable'
@@ -22,24 +22,30 @@ function App() {
         // console.log('Gewählter Layer:', layer)
     }
 
-    function MapController({ selectedFeature, selectedLayer }) {
+    function MapController({ selectedFeature, selectedLayer, setSelectedFeature, setSelectedLayer }) {
         const map = useMap()
 
         // Zoomen bei Layerauswahl
-        if (!selectedLayer) return null
-        const lower = selectedLayer.boundingBox.lowerCorner.split(' ')
-        const upper = selectedLayer.boundingBox.upperCorner.split(' ')
-        map.fitBounds([[lower[1], lower[0]], [upper[1], upper[0]]], { animate: true, duration: 2 })
-        map.invalidateSize()
-        setSelectedLayer(null)
+        useEffect(() => {
+            if (!selectedLayer) return
+            const lower = selectedLayer.boundingBox.lowerCorner.split(' ')
+            const upper = selectedLayer.boundingBox.upperCorner.split(' ')
+            map.fitBounds([[lower[1], lower[0]], [upper[1], upper[0]]], { animate: true, duration: 2 })
+            map.invalidateSize()
+            setSelectedLayer(null)
+        }, [selectedLayer])
+        
 
         // Zoomen auf ausgewähltes Feature
-        if (!selectedFeature) return null
-        const [lng, lat] = selectedFeature.geometry.coordinates
-        console.log([lng, lat])
-        map.flyTo([lat, lng], 12)
-        map.invalidateSize()
-        setSelectedFeature(null)
+        useEffect(() => {
+            if (!selectedFeature) return
+            const [lng, lat] = selectedFeature.geometry.coordinates
+            console.log([lng, lat])
+            map.flyTo([lat, lng], 12)
+            map.invalidateSize()
+            setSelectedFeature(null)
+        }, [selectedFeature])
+
         return null
     }
 
@@ -68,7 +74,7 @@ function App() {
                     attribution="© OpenStreetMap contributors"
                 />
                 {geoData && <GeoJSON key={JSON.stringify(geoData)} data={geoData} />}
-                <MapController selectedFeature={selectedFeature} selectedLayer={selectedLayer} />
+                <MapController selectedFeature={selectedFeature} selectedLayer={selectedLayer} setSelectedFeature={setSelectedFeature} setSelectedLayer={setSelectedLayer}/>
             </MapContainer>
             <CollapsiblePanel>
                 <AttributesTable geoJson={geoData} handleOnClick={handleFeatureClick} />
