@@ -1,25 +1,61 @@
+function cleanUrl(url) {
+  const parsed = new URL (url)
+  parsed.searchParams.delete("SERVICE")
+  parsed.searchParams.delete("REQUEST")
+  parsed.searchParams.delete("service")
+  parsed.searchParams.delete("request")
+  return parsed.toString()
+}
+
 export async function fetchCapabilities(url) {
-  const capUrl = `${url}?SERVICE=WFS&REQUEST=GetCapabilities`
+  const newUrl = cleanUrl(url)
+  const binding = (newUrl.includes('?')) ? '&' : '?'
+  const capUrl = `${newUrl}${binding}SERVICE=WFS&REQUEST=GetCapabilities`
+  //console.log(capUrl)
   const response = await fetch(capUrl)
+  //console.log(response.status)
   const text = await response.text()
+  console.log(text)
   const parser = new DOMParser()
   const xml = parser.parseFromString(text, 'application/xml')
-  const featureTypes = xml.getElementsByTagName('FeatureType')
+  console.log(xml.getElementsByTagNameNS('*', 'Operation')[0])
+  const featureTypes = xml.getElementsByTagNameNS('*', 'FeatureType')
+  const formats = new Set()
+  const formatElements = xml.getElementsByTagNameNS('*', 'Format')
+  const valueElements = xml.getElementsByTagNameNS('*', 'Value')
+  for ( const el of formatElements ) {
+    if (el.textContent.toLowerCase().includes('json')) formats.add(el.textContent)
+  }
+  for ( const el of valueElements ) {
+    if (el.textContent.toLowerCase().includes('json')) formats.add(el.textContent)
+  }
   const layers = []
   for (let i = 0; i < featureTypes.length; i++) {
-    const name = featureTypes[i].getElementsByTagName('Name')[0]?.textContent
-    const title = featureTypes[i].getElementsByTagName('Title')[0]?.textContent
-    const abstract = featureTypes[i].getElementsByTagName('Abstract')[0]?.textContent    
+    const name = featureTypes[i].getElementsByTagNameNS('*', 'Name')[0]?.textContent
+    const title = featureTypes[i].getElementsByTagNameNS('*', 'Title')[0]?.textContent
+    const abstract = featureTypes[i].getElementsByTagNameNS('*', 'Abstract')[0]?.textContent    
     const lowerCorner = featureTypes[i].getElementsByTagNameNS('*', 'LowerCorner')[0].textContent
     const upperCorner = featureTypes[i].getElementsByTagNameNS('*', 'UpperCorner')[0].textContent
     const boundingBox = { lowerCorner, upperCorner }
-    if (name) layers.push({ name, title: title || name, boundingBox, abstract })
+    // const outputFormatsElement = featureTypes[i].getElementsByTagNameNS('*', 'OutputFormats')[0]
+    // const formatElements = outputFormatsElement?.getElementsByTagNameNS('*', 'Format')
+    // const formats = new Set()
+    // for ( let j = 0; j < formatElements?.length; j++) {
+    //   formats.add(formatElements[j].textContent)
+    // }
+    if (name) layers.push({ name, title: title || name, boundingBox, abstract, formats })
   }
   return layers
 }
 
-export async function fetchFeatures(url, layerName) {
-  const featureUrl = `${url}?SERVICE=WFS&REQUEST=GetFeature&TYPENAMES=${layerName}&outputFormat=application/json&count=500`
+export async function fetchFeatures(url, layerName, outputFormats) {
+  const newUrl = cleanUrl(url)
+  const binding = (newUrl.includes('?')) ? '&' : '?'
+  console.log([...outputFormats])
+  //const format = outputFormats.includes('application/geo+json') ? 'application/geo%2Bjson' : 'application/json'
+  const format = outputFormats.values().next().value.replace('+', '%2B')
+  const featureUrl = `${newUrl}${binding}SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${layerName}&outputFormat=${format}&count=500`
+  console.log(featureUrl)
   const response = await fetch(featureUrl)
   const data = await response.json()
   console.log(data)

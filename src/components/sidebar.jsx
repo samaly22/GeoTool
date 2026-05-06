@@ -39,9 +39,9 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer }) {
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <MetaData layer={selectedLayer} />
       <ul style={{ marginTop: '1rem', paddingLeft: 0, listStyle: 'none' }}>
-        {layers.map(layer => (
+        {layers.map((layer, index) => (
           <li
-            key={layer.name}
+            key={index}
             onClick={() => onLayerSelect(layer)}
             style={{ cursor: 'pointer', padding: '0.4rem', borderBottom: '1px solid #ccc' }}
           >

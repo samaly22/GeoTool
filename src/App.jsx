@@ -19,9 +19,13 @@ function App() {
 
     async function handleLayerSelect(layer) {
         try {
+<<<<<<< HEAD
             setSelectedLayer(layer)
             setMetaLayer({ ...layer, url: wfsUrl })
             const data = await fetchFeatures(wfsUrl, layer.name)
+=======
+            const data = await fetchFeatures(wfsUrl, layer.name, layer.formats)
+>>>>>>> db28a03 (try dd & br data)
             setGeoData(data)
             setVisibleFeatures(data.features)
         } catch (e) {
@@ -86,7 +90,7 @@ function App() {
         if (!selectedFeature) return null
         const map = useMap()
         const [lng, lat] = selectedFeature.geometry.coordinates
-        //console.log([lng, lat])
+        console.log([lng, lat])
         map.flyTo([lat, lng], 12)
         map.invalidateSize()
         setSelectedFeature(null)
