@@ -1,4 +1,7 @@
-function AttributesTable({ features, handleOnClick }) {
+import { useState } from 'react'
+
+function AttributesTable({ features, handleOnClick, filterableFIDs, setFilterableFIDs, isFiltered, setIsFiltered, change, selectAll }) {
+
     if (!features) {
         return null
     }
@@ -6,6 +9,18 @@ function AttributesTable({ features, handleOnClick }) {
     return (
         <div style={{ width: 'auto', height: '100vh', padding: '1rem', overflowY: 'auto', background: '#f4f4f4' }}>
             <h2>Übersicht</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label>
+                    <input
+                    type="checkbox"
+                    checked={(filterableFIDs.length == features.length)} // Kontrolliert den Zustand
+                    onChange={(e) => selectAll()} // Behandelt Änderungen
+                    />
+                </label>
+                <button onClick={() => {if (filterableFIDs.length != 0) setIsFiltered(!isFiltered)}}>
+                    {isFiltered ? 'Filter auflösen' : 'Filtern'}
+                </button>
+            </div>
             {features.map((feature, index) =>
                 <div key={index}
                     onClick={() => {
@@ -17,6 +32,15 @@ function AttributesTable({ features, handleOnClick }) {
                                 border: '1px solid #ddd',
                                 borderRadius: '6px',
                                 boxShadow: '0 1px 3px rgba(0,0,0,0.08'}}>
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <label>
+                            <input
+                            type="checkbox"
+                            checked={filterableFIDs.includes(feature.id)} // Kontrolliert den Zustand
+                            onChange={(e) => change(feature.id)} // Behandelt Änderungen
+                            />
+                        </label>
+                    </div>
                     <table>
                         <thead>
                             <tr>

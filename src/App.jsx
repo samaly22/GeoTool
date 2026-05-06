@@ -4,11 +4,14 @@ import Sidebar from './components/sidebar'
 import AttributesTable from './components/attributesTable'
 import { fetchFeatures } from './services/wfs.js'
 import CollapsiblePanel from './components/collapsiblePanel'
+import config from './config.json'
 
 function App() {
     const [selectedFeature, setSelectedFeature] = useState(null)
     const [selectedLayer, setSelectedLayer] = useState(null)
     const [visibleFeatures, setVisibleFeatures] = useState(null)
+    const [filterableFIDs, setFilterableFIDs] = useState([])
+    const [isFiltered, setIsFiltered] = useState(false)
     const [geoData, setGeoData] = useState(null)
     const [wfsUrl, setWfsUrl] = useState('')
 
@@ -29,6 +32,7 @@ function App() {
 
         useMapEvents({
             moveend: () => {
+                if (!config.dynamicTable) return
                 if (!geoData) return
                 const bounds = map.getBounds()
                 const features = geoData.features.filter(feature =>
@@ -61,6 +65,21 @@ function App() {
         return null
     }
 
+    const displayedFeatures = isFiltered ? visibleFeatures.filter(f => filterableFIDs.includes(f.id)) : visibleFeatures
+
+    function selectAll() {
+        setIsFiltered(false)
+        if (visibleFeatures.length != filterableFIDs.length) {
+            setFilterableFIDs(visibleFeatures.map(f => f.id))
+        } else setFilterableFIDs([])
+    }
+
+    function change(id) {
+        if (filterableFIDs.includes(id)) {
+            setFilterableFIDs(filterableFIDs.filter(f => f !== id))
+        } else setFilterableFIDs([...filterableFIDs, id])
+    }
+
     function handleFeatureClick(feature) {
         setSelectedFeature(feature)
     }
@@ -85,7 +104,7 @@ function App() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution="© OpenStreetMap contributors"
                 />
-                {geoData && <GeoJSON key={JSON.stringify(geoData)} data={geoData} />}
+                {geoData && <GeoJSON key={JSON.stringify(displayedFeatures)} data={displayedFeatures} />}
                 <MapController selectedFeature={selectedFeature}
                                 selectedLayer={selectedLayer}
                                 setSelectedFeature={setSelectedFeature}
@@ -94,7 +113,7 @@ function App() {
                                 setVisibleFeatures={setVisibleFeatures} />
             </MapContainer>
             <CollapsiblePanel>
-                <AttributesTable features={visibleFeatures} handleOnClick={handleFeatureClick} />
+                <AttributesTable features={displayedFeatures} handleOnClick={handleFeatureClick} filterableFIDs={filterableFIDs} setFilterableFIDs={setFilterableFIDs} isFiltered={isFiltered} setIsFiltered={setIsFiltered} change={change} selectAll={selectAll}/>
             </CollapsiblePanel>
         </div>    
     )
