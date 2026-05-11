@@ -63,7 +63,6 @@ function App() {
             setSelectedFeature(null)
         }, [selectedFeature])
 
-        return null
     }
 
     const displayedFeatures = isFiltered ? visibleFeatures.filter(f => filterableFIDs.includes(f.id)) : visibleFeatures
