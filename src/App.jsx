@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet'
 import Sidebar from './components/sidebar'
 import AttributesTable from './components/attributesTable'
+import MetaData from './components/metaData.jsx'
 import { fetchFeatures } from './services/wfs.js'
 import CollapsiblePanel from './components/collapsiblePanel'
 import config from './config.json'
@@ -20,6 +21,7 @@ function App() {
         try {
             setSelectedLayer(layer)
             const data = await fetchFeatures(wfsUrl, layer.name)
+            setSelectedLayer(layer)
             setGeoData(data)
             setVisibleFeatures(data.features)
         } catch (e) {
@@ -109,6 +111,7 @@ function App() {
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
             <Sidebar onLayerSelect={handleLayerSelect} onUrlChange={setWfsUrl} />
+            <MetaData layer={selectedLayer} />
             <MapContainer
                 center={[51.505, -0.39]}
                 zoom={5}

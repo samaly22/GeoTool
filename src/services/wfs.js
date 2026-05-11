@@ -9,10 +9,11 @@ export async function fetchCapabilities(url) {
   for (let i = 0; i < featureTypes.length; i++) {
     const name = featureTypes[i].getElementsByTagName('Name')[0]?.textContent
     const title = featureTypes[i].getElementsByTagName('Title')[0]?.textContent
+    const abstract = featureTypes[i].getElementsByTagName('Abstract')[0]?.textContent    
     const lowerCorner = featureTypes[i].getElementsByTagNameNS('*', 'LowerCorner')[0].textContent
     const upperCorner = featureTypes[i].getElementsByTagNameNS('*', 'UpperCorner')[0].textContent
     const boundingBox = { lowerCorner, upperCorner }
-    if (name) layers.push({ name, title: title || name, boundingBox })
+    if (name) layers.push({ name, title: title || name, boundingBox, abstract })
   }
   return layers
 }
