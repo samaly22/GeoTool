@@ -1,3 +1,4 @@
 {
-    "dynamicTable": false
+    "dynamicTable": false,
+    "WFSnameKeys": ["Name", "name", "NAME", "bez", "bezeichnung", "title", "Title"]
 }

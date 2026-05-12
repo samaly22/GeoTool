@@ -1,7 +1,7 @@
 function MetaData ({ layer }) {
     if (!layer) return null
 
-    console.log(layer.metadataURL)
+    //console.log(layer.metadataURL)
 
     return (
         <div>
@@ -20,16 +20,16 @@ function MetaData ({ layer }) {
                         <td>{layer.abstract}</td>
                     </tr>
                     <tr>
-                        <td>Geo-Eingrenzung:</td>
+                        <td>Grenzen:</td>
                         <td>{layer.boundingBox.lowerCorner} / {layer.boundingBox.upperCorner}</td>
                     </tr>
                     <tr>
-                        <td>Metadaten URL:</td>
+                        <td>URL:</td>
                         <td><a href={layer.url} target="_blank">{layer.url}</a></td>
                     </tr>
                     <tr>
                         <td>Formate:</td>
-                        <td>{layer.formats}</td>
+                        <td>{[...layer.formats].join('; ')}</td>
                     </tr>
                 </tbody>
             </table>

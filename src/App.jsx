@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import L from 'leaflet'
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet'
 import Sidebar from './components/sidebar'
 import AttributesTable from './components/attributesTable'
@@ -21,7 +22,7 @@ function App() {
         try {
             setSelectedLayer(layer)
             setMetaLayer({ ...layer, url: wfsUrl })
-            const data = await fetchFeatures(wfsUrl, layer.name)
+            const data = await fetchFeatures(wfsUrl, layer.name, layer.formats)
             setGeoData(data)
             setVisibleFeatures(data.features)
         } catch (e) {
@@ -58,9 +59,13 @@ function App() {
         // Zoomen auf ausgewähltes Feature
         useEffect(() => {
             if (!selectedFeature) return
-            const [lng, lat] = selectedFeature.geometry.coordinates
-            console.log([lng, lat])
-            map.flyTo([lat, lng], 12)
+            if (selectedFeature.geometry.type === 'Point') {
+                const [lng, lat] = selectedFeature.geometry.coordinates
+                map.flyTo([lat, lng], 12)
+            } else {
+                const bounds = L.geoJSON(selectedFeature).getBounds()
+                map.fitBounds(bounds)
+            }
             map.invalidateSize()
             setSelectedFeature(null)
         }, [selectedFeature])
@@ -88,7 +93,13 @@ function App() {
 
     function onEachFeature(feature, layer) {
         if (feature) {
-            layer.bindTooltip(feature.properties.NAME)
+            const nameKey = config.WFSnameKeys.find(key => feature.properties[key])
+            const tooltipText = nameKey ? feature.properties[nameKey] : 'Feature'
+            console.log(config.WFSnameKeys)
+            console.log(feature.properties)
+            console.log(nameKey)
+            console.log(tooltipText)
+            layer.bindTooltip(tooltipText)
             const popupContent = `
                 <div>
                     <table>
