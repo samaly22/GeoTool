@@ -1,29 +1,37 @@
-function MetaData (layer) {
+function MetaData ({ layer }) {
     if (!layer) return null
+
+    console.log(layer.metadataURL)
 
     return (
         <div>
             <table>
-                <tr>
-                    <td>Name:</td>
-                    <td>{layer.name}</td>
-                </tr>
-                <tr>
-                    <td>Titel:</td>
-                    <td>{layer.title}</td>
-                </tr>
-                <tr>
-                    <td>Beschreibung:</td>
-                    <td>{layer.abtract}</td>
-                </tr>
-                <tr>
-                    <td>Geo-Eingrenzung:</td>
-                    <td>{layer.boundingBox}</td>
-                </tr>
-                <tr>
-                    <td>Formate:</td>
-                    <td>{layer.formats}</td>
-                </tr>
+                <tbody>
+                    <tr>
+                        <td>Name:</td>
+                        <td>{layer.name}</td>
+                    </tr>
+                    <tr>
+                        <td>Titel:</td>
+                        <td>{layer.title}</td>
+                    </tr>
+                    <tr>
+                        <td>Beschreibung:</td>
+                        <td>{layer.abstract}</td>
+                    </tr>
+                    <tr>
+                        <td>Geo-Eingrenzung:</td>
+                        <td>{layer.boundingBox.lowerCorner} / {layer.boundingBox.upperCorner}</td>
+                    </tr>
+                    <tr>
+                        <td>Metadaten URL:</td>
+                        <td><a href={layer.url} target="_blank">{layer.url}</a></td>
+                    </tr>
+                    <tr>
+                        <td>Formate:</td>
+                        <td>{layer.formats}</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     )

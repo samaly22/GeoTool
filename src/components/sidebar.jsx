@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { fetchCapabilities } from '../services/wfs.js'
+import MetaData from './metaData.jsx'
 
-function Sidebar({ onLayerSelect, onUrlChange }) {
+function Sidebar({ onLayerSelect, onUrlChange, selectedLayer }) {
   const [url, setUrl] = useState('')
   const [layers, setLayers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -36,6 +37,7 @@ function Sidebar({ onLayerSelect, onUrlChange }) {
         {loading ? 'Lade...' : 'Load'}
       </button>
       {error && <p style={{ color: 'red' }}>{error}</p>}
+      <MetaData layer={selectedLayer} />
       <ul style={{ marginTop: '1rem', paddingLeft: 0, listStyle: 'none' }}>
         {layers.map(layer => (
           <li
