@@ -27,6 +27,9 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
       try {
         const result = await fetchCapabilities(url)
         setLayers(result)
+        if (result.length === 1) {
+          onLayerSelect(result[0])
+        }
       } catch (e) {
         setError('Verbindung fehlgeschlagen. Prüfe die URL.')
       }
