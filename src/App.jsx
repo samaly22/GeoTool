@@ -18,6 +18,14 @@ function App() {
     const [geoData, setGeoData] = useState(null)
     const [wfsUrl, setWfsUrl] = useState('')
 
+    function handleGeoJSONLoad(data) {
+        console.log(data)
+        setGeoData(data)
+        setVisibleFeatures(data.features)
+        const bounds = L.geoJSON(data).getBounds()
+        setSelectedLayer({ boundingBox: {lowerCorner: `${bounds.getWest()} ${bounds.getSouth()}`, upperCorner: `${bounds.getEast()} ${bounds.getNorth()}` }})
+    }
+    
     async function handleLayerSelect(layer) {
         try {
             setSelectedLayer(layer)
@@ -121,7 +129,7 @@ function App() {
 
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
-            <Sidebar onLayerSelect={handleLayerSelect} onUrlChange={setWfsUrl} selectedLayer={metaLayer} />            
+            <Sidebar onLayerSelect={handleLayerSelect} onUrlChange={setWfsUrl} selectedLayer={metaLayer} onGeoJSONLoad={handleGeoJSONLoad}/>            
             <MapContainer
                 center={[51.505, -0.39]}
                 zoom={5}

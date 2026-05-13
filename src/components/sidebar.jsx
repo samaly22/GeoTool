@@ -1,42 +1,92 @@
 import { useState } from 'react'
 import { fetchCapabilities } from '../services/wfs.js'
+import { fetchGeoJSON } from '../services/geojson.js'
 import MetaData from './metaData.jsx'
 
-function Sidebar({ onLayerSelect, onUrlChange, selectedLayer }) {
+function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onGeoJSONLoad }) {
   const [url, setUrl] = useState('')
   const [layers, setLayers] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [activeTab, setActiveTab] = useState('wfs')
 
   async function handleLoad() {
     setLoading(true)
     setError(null)
-    try {
-      const result = await fetchCapabilities(url)
-      setLayers(result)
-    } catch (e) {
-      setError('Verbindung fehlgeschlagen. Prüfe die URL.')
+    console.log(url)
+    if (activeTab === 'geoJSON') {
+      try {
+        console.log('handleLoad aufgerufen', url)
+        const result = await fetchGeoJSON(url)
+        onGeoJSONLoad(result)
+      } catch (e) {
+        setError('Verbindung fehlgeschlagen. Prüfe die URL.')
+      }
+    } else if (activeTab === 'wfs'){
+      try {
+        const result = await fetchCapabilities(url)
+        setLayers(result)
+      } catch (e) {
+        setError('Verbindung fehlgeschlagen. Prüfe die URL.')
+      }
     }
+
     setLoading(false)
   }
 
   return (
     <div style={{ width: '300px', padding: '1rem', overflowY: 'auto', background: '#f4f4f4' }}>
-      <h2>WFS Explorer</h2>
-      <input
-        type="text"
-        placeholder="WFS URL eingeben..."
-        value={url}
-        onChange={e => {
-            setUrl(e.target.value)
-            onUrlChange(e.target.value)
-        }}
-        style={{ width: '100%', marginBottom: '0.5rem' }}
-      />
-      <button onClick={handleLoad} disabled={loading}>
-        {loading ? 'Lade...' : 'Load'}
-      </button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <h2>GeoDataExplorer</h2>
+
+
+
+      <button onClick={() => setActiveTab('wfs')}>WFS</button>
+      <button onClick={() => setActiveTab('geoJSON')}>GeoJSON</button>
+      <button onClick={() => setActiveTab('csv')}>CSV</button>
+      {activeTab === 'wfs' &&
+      <div>
+        <input
+          type="text"
+          placeholder="WFS URL eingeben..."
+          value={url}
+          onChange={e => {
+              setUrl(e.target.value)
+              onUrlChange(e.target.value)
+          }}
+          style={{ width: '100%', marginBottom: '0.5rem' }}
+        />
+        <button onClick={handleLoad} disabled={loading}>
+          {loading ? 'Lade...' : 'Load'}
+        </button>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+      </div>
+      }
+      {activeTab === 'geoJSON' &&
+      <div>
+        <input
+          type="text"
+          placeholder="GeoJSON URL eingeben..."
+          value={url}
+          onChange={e => {
+              setUrl(e.target.value)
+              onUrlChange(e.target.value)
+          }}
+          style={{ width: '100%', marginBottom: '0.5rem' }}
+        />
+        <button onClick={handleLoad} disabled={loading}>
+          {loading ? 'Lade...' : 'Load'}
+        </button>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+      </div>
+      }
+      {activeTab === 'csv' &&
+      <div>
+        <input type="file" accept=".csv"></input>
+      </div> 
+      }
+
+
+
       <MetaData layer={selectedLayer} />
       <ul style={{ marginTop: '1rem', paddingLeft: 0, listStyle: 'none' }}>
         {layers.map((layer, index) => (
