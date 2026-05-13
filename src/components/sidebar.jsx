@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { fetchCapabilities } from '../services/wfs.js'
 import { fetchGeoJSON } from '../services/geojson.js'
 import MetaData from './metaData.jsx'
+import { readCSV } from '../services/csv.js'
 
-function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onGeoJSONLoad }) {
+function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
   const [url, setUrl] = useState('')
   const [layers, setLayers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -18,7 +19,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onGeoJSONLoad }) {
       try {
         console.log('handleLoad aufgerufen', url)
         const result = await fetchGeoJSON(url)
-        onGeoJSONLoad(result)
+        onDataLoad(result)
       } catch (e) {
         setError('Verbindung fehlgeschlagen. Prüfe die URL.')
       }
@@ -81,7 +82,10 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onGeoJSONLoad }) {
       }
       {activeTab === 'csv' &&
       <div>
-        <input type="file" accept=".csv"></input>
+        <input type="file" accept=".csv" onChange={async (e) => {
+          const result = await readCSV(e.target.files[0])
+          onDataLoad(result)
+          }} />
       </div> 
       }
 
