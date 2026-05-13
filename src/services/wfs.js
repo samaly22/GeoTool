@@ -15,7 +15,7 @@ export async function fetchCapabilities(url) {
   const response = await fetch(capUrl)
   //console.log(response.status)
   const text = await response.text()
-  //console.log(text)
+  console.log(text)
   const parser = new DOMParser()
   const xml = parser.parseFromString(text, 'application/xml')
   //console.log(xml.getElementsByTagNameNS('*', 'Operation')[0])
@@ -54,10 +54,10 @@ export async function fetchFeatures(url, layerName, outputFormats) {
   //console.log([...outputFormats])
   //const format = outputFormats.includes('application/geo+json') ? 'application/geo%2Bjson' : 'application/json'
   const format = outputFormats.values().next().value.replace('+', '%2B')
-  const featureUrl = `${newUrl}${binding}SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${layerName}&outputFormat=${format}&count=500`
+  const featureUrl = `${newUrl}${binding}SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${layerName}&outputFormat=${format}&SRSNAME=EPSG:4326&count=500`
   //console.log(featureUrl)
   const response = await fetch(featureUrl)
   const data = await response.json()
-  //console.log(data)
+  console.log(data.crs)
   return data
 }
