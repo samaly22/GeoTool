@@ -19,7 +19,7 @@ function App() {
     const [wfsUrl, setWfsUrl] = useState('')
 
     function handleGeoJSONLoad(data) {
-        console.log(data)
+        //console.log(data)
         setGeoData(data)
         setVisibleFeatures(data.features)
         const bounds = L.geoJSON(data).getBounds()
@@ -59,7 +59,8 @@ function App() {
             const lower = selectedLayer.boundingBox.lowerCorner.split(' ')
             const upper = selectedLayer.boundingBox.upperCorner.split(' ')
             map.fitBounds([[lower[1], lower[0]], [upper[1], upper[0]]], { animate: true, duration: 2 })
-            map.invalidateSize()
+            setTimeout(() => map.invalidateSize(), 300)
+            console.log('lower:', lower, 'upper:', upper)
             setSelectedLayer(null)
         }, [selectedLayer])
         
@@ -81,6 +82,7 @@ function App() {
     }
 
     const displayedFeatures = isFiltered ? visibleFeatures.filter(f => filterableFIDs.includes(f.id)) : visibleFeatures
+    console.log(displayedFeatures)
 
     function selectAll() {
         setIsFiltered(false)
@@ -103,10 +105,10 @@ function App() {
         if (feature) {
             const nameKey = config.WFSnameKeys.find(key => feature.properties[key])
             const tooltipText = nameKey ? feature.properties[nameKey] : 'Feature'
-            console.log(config.WFSnameKeys)
-            console.log(feature.properties)
-            console.log(nameKey)
-            console.log(tooltipText)
+            //console.log(config.WFSnameKeys)
+            //console.log(feature.properties)
+            //console.log(nameKey)
+            //console.log(tooltipText)
             layer.bindTooltip(tooltipText)
             const popupContent = `
                 <div>
@@ -139,7 +141,7 @@ function App() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution="© OpenStreetMap contributors"
                 />
-                {geoData && <GeoJSON key={JSON.stringify(displayedFeatures)} data={displayedFeatures} onEachFeature={onEachFeature} />}
+                {geoData && <GeoJSON key={JSON.stringify(displayedFeatures)} data={{ type:'FeatureCollection', features: displayedFeatures }} onEachFeature={onEachFeature} />}
                 <MapController selectedFeature={selectedFeature}
                                 selectedLayer={selectedLayer}
                                 setSelectedFeature={setSelectedFeature}

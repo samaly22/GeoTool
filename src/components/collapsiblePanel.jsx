@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 function CollapsiblePanel ({ children }) {
-    const [isOpen, setIsOpen] = useState(true)
+    const [isOpen, setIsOpen] = useState(false)
 
     function togglePanel() {
         setIsOpen(!isOpen)

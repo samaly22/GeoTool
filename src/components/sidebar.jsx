@@ -83,12 +83,16 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
       {activeTab === 'csv' &&
       <div>
         <input type="file" accept=".csv" onChange={async (e) => {
-          const result = await readCSV(e.target.files[0])
-          onDataLoad(result)
+          try {
+            const result = await readCSV(e.target.files[0])
+            onDataLoad(result)
+          } catch (e) {
+            setError(e.message)
+          }
           }} />
+          {error && <p style={{ color: 'red' }}>{error}</p>}
       </div> 
       }
-
 
 
       <MetaData layer={selectedLayer} />

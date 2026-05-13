@@ -25,6 +25,7 @@ export async function readCSV(file) {
                     obj[h] = values[i]
                 });
                 const geomKey = findGeometryKey(obj)
+                if (!geomKey) return null
                 const wkt = obj[geomKey].replace(/^SRID=\d+;/, '')
                 const geometry = wellknown.parse(wkt)
                 const properties = { ...obj}
@@ -35,6 +36,14 @@ export async function readCSV(file) {
                     properties
                 }
             })
+            //console.log(data)
+            const features = data.filter(f => f !== null)
+            //console.log(features)
+            if (features.length === 0) {
+                reject(new Error('Datei enthält keine darstellbaren Geodaten!'))
+                return
+            }
+            
             resolve ({
                 type: 'FeatureCollection',
                 features: data
