@@ -14,7 +14,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
   async function handleLoad() {
     setLoading(true)
     setError(null)
-    console.log(url)
+    //console.log(url)
     if (activeTab === 'geoJSON') {
       try {
         console.log('handleLoad aufgerufen', url)
@@ -31,7 +31,6 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
         setError('Verbindung fehlgeschlagen. Prüfe die URL.')
       }
     }
-
     setLoading(false)
   }
 
@@ -41,8 +40,14 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
 
 
 
-      <button onClick={() => setActiveTab('wfs')}>WFS</button>
-      <button onClick={() => setActiveTab('geoJSON')}>GeoJSON</button>
+      <button onClick={() => {
+        setActiveTab('wfs')
+        setUrl('')
+        }}>WFS</button>
+      <button onClick={() => {
+        setActiveTab('geoJSON')
+        setUrl('')
+        }}>GeoJSON</button>
       <button onClick={() => setActiveTab('csv')}>CSV</button>
       {activeTab === 'wfs' &&
       <div>
@@ -84,11 +89,14 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
       <div>
         <input type="file" accept=".csv" onChange={async (e) => {
           try {
+            setLoading(true)
+            setError(null)
             const result = await readCSV(e.target.files[0])
             onDataLoad(result)
           } catch (e) {
             setError(e.message)
           }
+          setLoading(false)
           }} />
           {error && <p style={{ color: 'red' }}>{error}</p>}
       </div> 

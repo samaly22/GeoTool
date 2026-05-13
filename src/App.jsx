@@ -82,7 +82,6 @@ function App() {
     }
 
     const displayedFeatures = isFiltered ? visibleFeatures.filter(f => filterableFIDs.includes(f.id)) : visibleFeatures
-    console.log(displayedFeatures)
 
     function selectAll() {
         setIsFiltered(false)
