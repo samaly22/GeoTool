@@ -4,12 +4,14 @@ import { fetchGeoJSON } from '../services/geojson.js'
 import MetaData from './metaData.jsx'
 import { readCSV } from '../services/csv.js'
 
-function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
+function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, activeLayers, removeLayer }) {
   const [url, setUrl] = useState('')
   const [layers, setLayers] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('wfs')
+  const [showActiveLayers, setShowActiveLayers] = useState(true)
+  const [showAllLayers, setShowAllLayers] = useState(true)
 
   async function handleLoad() {
     setLoading(true)
@@ -108,7 +110,34 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
 
 
       <MetaData layer={selectedLayer} />
-      <ul style={{ marginTop: '1rem', paddingLeft: 0, listStyle: 'none' }}>
+
+      {activeLayers.length > 0 && (
+        <div>
+          <div onClick={() => setShowActiveLayers(p => !p)} style={{ cursor: 'pointer', fontWeight: 'bold' }} >
+            {showActiveLayers ? '▾' : '▸'} Ausgewählte Layer
+          </div>
+          {showActiveLayers && activeLayers.map(layer => (
+            <div key={layer.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem', borderBottom: '1px solid #ccc' }} >
+              <span>{layer.name}</span>
+              <button onClick={() => removeLayer(layer.id)}>X</button>
+            </div> 
+          ))}
+        </div>
+      )}
+
+      {layers.length > 0 &&
+        <div>
+          <div onClick={() => setShowAllLayers(p => !p)} style={{ cursor: 'pointer', fontWeight: 'bold' }} >
+            {showAllLayers ? '▾' : '▸'} Alle Layer
+          </div>
+          {showAllLayers && layers.map((layer, index) => (
+            <li key={index} onClick={() => onLayerSelect(layer)} style={{ cursor: 'pointer', padding: '0.4rem', borderBottom: '1px solid #ccc', listStyle: 'none' }} >
+              {layer.title}
+            </li> 
+          ))}
+        </div>
+      }
+      {/* <ul style={{ marginTop: '1rem', paddingLeft: 0, listStyle: 'none' }}>
         {layers.map((layer, index) => (
           <li
             key={index}
@@ -118,7 +147,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
             {layer.title}
           </li>
         ))}
-      </ul>
+      </ul> */}
     </div>
   )
 }

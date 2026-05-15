@@ -26,6 +26,10 @@ function App() {
         })
     }
 
+    function removeLayer(id) {
+        setLayers(prev => prev.filter(l => l.id !== id))
+    }
+
     function handleGeoJSONLoad(data, name) {
         //console.log(data)
         addLayer(name, 'geojson', data)
@@ -142,7 +146,14 @@ function App() {
 
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
-            <Sidebar onLayerSelect={handleLayerSelect} onUrlChange={setWfsUrl} selectedLayer={metaLayer} onDataLoad={handleGeoJSONLoad}/>            
+            <Sidebar
+                onLayerSelect={handleLayerSelect}
+                onUrlChange={setWfsUrl}
+                selectedLayer={metaLayer}
+                onDataLoad={handleGeoJSONLoad}
+                activeLayers={layers}
+                removeLayer={removeLayer}
+            />            
             <MapContainer
                 center={[51.505, -0.39]}
                 zoom={5}
