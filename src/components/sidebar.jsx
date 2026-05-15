@@ -12,6 +12,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
   const [activeTab, setActiveTab] = useState('wfs')
   const [showActiveLayers, setShowActiveLayers] = useState(true)
   const [showAllLayers, setShowAllLayers] = useState(true)
+  const [expandedMeta, setExpandedMeta] = useState({})
 
   async function handleLoad() {
     setLoading(true)
@@ -21,7 +22,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
       try {
         console.log('handleLoad aufgerufen', url)
         const result = await fetchGeoJSON(url)
-        onDataLoad(result, url)
+        onDataLoad(result.geojson, result.title ?? url, url, 'geojson')
       } catch (e) {
         setError('Verbindung fehlgeschlagen. Prüfe die URL.')
       }
@@ -39,6 +40,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
     setLoading(false)
   }
 
+  //console.log(activeLayers)
   return (
     <div style={{ width: '300px', padding: '1rem', overflowY: 'auto', background: '#f4f4f4' }}>
       <h2>GeoDataExplorer</h2>
@@ -98,7 +100,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
             setError(null)
             const file = e.target.files[0]
             const result = await readCSV(file)
-            onDataLoad(result, file.name)
+            onDataLoad(result, file.name, null, 'csv')
           } catch (e) {
             setError(e.message)
           }
@@ -108,18 +110,21 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
       </div> 
       }
 
-
-      <MetaData layer={selectedLayer} />
-
       {activeLayers.length > 0 && (
         <div>
           <div onClick={() => setShowActiveLayers(p => !p)} style={{ cursor: 'pointer', fontWeight: 'bold' }} >
             {showActiveLayers ? '▾' : '▸'} Ausgewählte Layer
           </div>
           {showActiveLayers && activeLayers.map(layer => (
-            <div key={layer.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem', borderBottom: '1px solid #ccc' }} >
-              <span>{layer.name}</span>
-              <button onClick={() => removeLayer(layer.id)}>X</button>
+            <div key={layer.id} style={{ borderBottom: '1px solid #ccc' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.4rem' }}>
+                <span>{layer.name}</span>
+                <div>
+                  <button onClick={() => setExpandedMeta(prev => ({ ...prev, [layer.id]: !prev[layer.id] }))}>ℹ</button>
+                  <button onClick={() => removeLayer(layer.id)}>✕</button>
+                </div>
+              </div>
+              {expandedMeta[layer.id] && <MetaData layer={layer} />}
             </div> 
           ))}
         </div>
@@ -137,17 +142,6 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
           ))}
         </div>
       }
-      {/* <ul style={{ marginTop: '1rem', paddingLeft: 0, listStyle: 'none' }}>
-        {layers.map((layer, index) => (
-          <li
-            key={index}
-            onClick={() => onLayerSelect(layer)}
-            style={{ cursor: 'pointer', padding: '0.4rem', borderBottom: '1px solid #ccc' }}
-          >
-            {layer.title}
-          </li>
-        ))}
-      </ul> */}
     </div>
   )
 }

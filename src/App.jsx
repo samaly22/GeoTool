@@ -18,11 +18,11 @@ function App() {
     const [layers, setLayers] = useState([])
     const [wfsUrl, setWfsUrl] = useState('')
 
-    function addLayer(name, source, data) {
+    function addLayer(name, title, source, data, meta = null) {
         setLayers(prev => {
             if (prev.some(l => l.name === name)) return prev
             const id = `layer-${Date.now()}`
-            return [ ...prev, { id, name, source, data }]
+            return [ ...prev, { id, name, title, source, data, meta }]
         })
     }
 
@@ -30,10 +30,10 @@ function App() {
         setLayers(prev => prev.filter(l => l.id !== id))
     }
 
-    function handleGeoJSONLoad(data, name) {
+    function handleGeoJSONLoad(data, name, url, source = 'geojson') {
         //console.log(data)
-        addLayer(name, 'geojson', data)
-        console.log(layers)
+        addLayer(name, name, source, data, { url })
+        //console.log(layers)
         setVisibleFeatures(data.features)
         const bounds = L.geoJSON(data).getBounds()
         setSelectedLayer({ boundingBox: {lowerCorner: `${bounds.getWest()} ${bounds.getSouth()}`, upperCorner: `${bounds.getEast()} ${bounds.getNorth()}` }})
@@ -42,9 +42,9 @@ function App() {
     async function handleLayerSelect(layer) {
         try {
             setSelectedLayer(layer)
-            setMetaLayer({ ...layer, url: wfsUrl })
+            //setMetaLayer({ ...layer, url: wfsUrl })
             const data = await fetchFeatures(wfsUrl, layer.name, layer.formats)
-            addLayer(layer.name, 'wfs', data)
+            addLayer(layer.name, layer.title, 'wfs', data, { ...layer, url: wfsUrl})
             //console.log(layers)
             setVisibleFeatures(data.features)
         } catch (e) {
@@ -61,7 +61,7 @@ function App() {
                 if (!config.dynamicTable) return
                 if (!layers) return
                 const bounds = map.getBounds()
-                const allFeatures = layers.flatMap(l => l.data.features)
+                const allFeatures = layers.flatMap(l => l.data.features ?? [])
                 const features = allFeatures.filter(feature =>
                     bounds.contains([feature.geometry.coordinates[1], feature.geometry.coordinates[0]])
                 )
@@ -97,7 +97,7 @@ function App() {
     }
 
     //const displayedFeatures = isFiltered ? visibleFeatures.filter(f => filterableFIDs.includes(f.id)) : visibleFeatures
-    const displayedFeatures = layers.flatMap(l => l.data.features)
+    const displayedFeatures = layers.flatMap(l => l.data?.features ?? [])
 
     function selectAll() {
         setIsFiltered(false)
