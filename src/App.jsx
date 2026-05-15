@@ -15,12 +15,21 @@ function App() {
     const [visibleFeatures, setVisibleFeatures] = useState(null)
     const [filterableFIDs, setFilterableFIDs] = useState([])
     const [isFiltered, setIsFiltered] = useState(false)
-    const [geoData, setGeoData] = useState(null)
+    const [layers, setLayers] = useState([])
     const [wfsUrl, setWfsUrl] = useState('')
 
-    function handleGeoJSONLoad(data) {
+    function addLayer(name, source, data) {
+        setLayers(prev => {
+            if (prev.some(l => l.name === name)) return prev
+            const id = `layer-${Date.now()}`
+            return [ ...prev, { id, name, source, data }]
+        })
+    }
+
+    function handleGeoJSONLoad(data, name) {
         //console.log(data)
-        setGeoData(data)
+        addLayer(name, 'geojson', data)
+        console.log(layers)
         setVisibleFeatures(data.features)
         const bounds = L.geoJSON(data).getBounds()
         setSelectedLayer({ boundingBox: {lowerCorner: `${bounds.getWest()} ${bounds.getSouth()}`, upperCorner: `${bounds.getEast()} ${bounds.getNorth()}` }})
@@ -31,7 +40,8 @@ function App() {
             setSelectedLayer(layer)
             setMetaLayer({ ...layer, url: wfsUrl })
             const data = await fetchFeatures(wfsUrl, layer.name, layer.formats)
-            setGeoData(data)
+            addLayer(layer.name, 'wfs', data)
+            //console.log(layers)
             setVisibleFeatures(data.features)
         } catch (e) {
             console.error('Fehler beim Laden des Layers:', e)
@@ -45,9 +55,10 @@ function App() {
         useMapEvents({
             moveend: () => {
                 if (!config.dynamicTable) return
-                if (!geoData) return
+                if (!layers) return
                 const bounds = map.getBounds()
-                const features = geoData.features.filter(feature =>
+                const allFeatures = layers.flatMap(l => l.data.features)
+                const features = allFeatures.filter(feature =>
                     bounds.contains([feature.geometry.coordinates[1], feature.geometry.coordinates[0]])
                 )
                 setVisibleFeatures(features)
@@ -81,7 +92,8 @@ function App() {
 
     }
 
-    const displayedFeatures = isFiltered ? visibleFeatures.filter(f => filterableFIDs.includes(f.id)) : visibleFeatures
+    //const displayedFeatures = isFiltered ? visibleFeatures.filter(f => filterableFIDs.includes(f.id)) : visibleFeatures
+    const displayedFeatures = layers.flatMap(l => l.data.features)
 
     function selectAll() {
         setIsFiltered(false)
@@ -140,12 +152,18 @@ function App() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution="© OpenStreetMap contributors"
                 />
-                {geoData && <GeoJSON key={JSON.stringify(displayedFeatures)} data={{ type:'FeatureCollection', features: displayedFeatures }} onEachFeature={onEachFeature} />}
+                {layers.map(layer => (
+                    <GeoJSON
+                        key={layer.id}
+                        data={{ type:'FeatureCollection', features: displayedFeatures }}
+                        onEachFeature={onEachFeature}
+                    />
+                ))}
                 <MapController selectedFeature={selectedFeature}
                                 selectedLayer={selectedLayer}
                                 setSelectedFeature={setSelectedFeature}
                                 setSelectedLayer={setSelectedLayer} 
-                                geoData={geoData}
+                                geoData={layers}
                                 setVisibleFeatures={setVisibleFeatures} />
             </MapContainer>
             <CollapsiblePanel>

@@ -19,7 +19,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
       try {
         console.log('handleLoad aufgerufen', url)
         const result = await fetchGeoJSON(url)
-        onDataLoad(result)
+        onDataLoad(result, url)
       } catch (e) {
         setError('Verbindung fehlgeschlagen. Prüfe die URL.')
       }
@@ -94,8 +94,9 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad }) {
           try {
             setLoading(true)
             setError(null)
-            const result = await readCSV(e.target.files[0])
-            onDataLoad(result)
+            const file = e.target.files[0]
+            const result = await readCSV(file)
+            onDataLoad(result, file.name)
           } catch (e) {
             setError(e.message)
           }
