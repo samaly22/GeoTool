@@ -196,7 +196,17 @@ function App() {
         setHeatmaps(prev => ({ ...prev, [layerId]: !prev[layerId] }))
     }
 
-    
+    function moveLayer(id, direction) {
+        setLayers(prev => {
+            const index = prev.findIndex(l => l.id === id)
+            if (direction === 'up' && index === 0) return prev
+            if (direction === 'down' && index === prev.length - 1) return prev
+            const newLayers = [...prev]
+            const swapIndex = direction === 'up' ? index - 1 : index + 1
+            ;[newLayers[index], newLayers[swapIndex]] = [newLayers[swapIndex], newLayers[index]]
+            return newLayers
+        })
+    }
 
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
@@ -212,6 +222,7 @@ function App() {
                 setChoropleth={setChoropleth}
                 heatmaps={heatmaps}
                 toggleHeatmap={toggleHeatmap}
+                moveLayer={moveLayer}
             />
             <div style={{ flex: 1, position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 1000 }}>
