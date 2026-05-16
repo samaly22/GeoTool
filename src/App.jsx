@@ -28,7 +28,8 @@ function App() {
             if (prev.some(l => l.name === name)) return prev
             const id = `layer-${Date.now()}`
             const color = config.colors[prev.length % config.colors.length]
-            return [ ...prev, { id, name, title, source, data, meta, color }]
+            const analysis = analyzeLayer(data)
+            return [ ...prev, { id, name, title, source, data, meta, color, analysis }]
         })
     }
 
@@ -152,6 +153,16 @@ function App() {
             mouseover: (e) => setHoveredFeature(feature),
             mouseout: (e) => setHoveredFeature(null)
         })
+    }
+
+    function analyzeLayer(data) {
+        const feature = data.features[0]
+        if (!feature) return null
+        const geometryType = feature.geometry.type
+        const numericColumns = Object.entries(feature.properties)
+            .filter(([key, value]) => typeof value === 'number')
+            .map(([key]) => key)
+        return { geometryType, numericColumns }
     }
 
     
