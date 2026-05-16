@@ -267,6 +267,12 @@ function App() {
                                     <GeoJSON
                                         key={`${layer.id}-${layer.color}-${choroplethColumn}`}
                                         data={{ type:'FeatureCollection', features: layer.data.features }}
+                                        pointToLayer={(feature, latlng) => L.circleMarker(latlng, {
+                                            radius: 6,
+                                            color: layer.color,
+                                            fillColor: layer.color,
+                                            fillOpacity: 0.7
+                                        })}
                                         style={feature => {
                                             if (!choroplethColumn) return { color: layer.color, fillColor: layer.color, fillOpacity: 0.4 }
                                             const value = feature.properties[choroplethColumn]
