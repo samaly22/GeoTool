@@ -1,3 +1,7 @@
+import proj4 from 'proj4'
+
+proj4.defs('EPSG:25833', '+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs')
+
 function cleanUrl(url) {
   const parsed = new URL (url)
   parsed.searchParams.delete("SERVICE")
@@ -5,6 +9,26 @@ function cleanUrl(url) {
   parsed.searchParams.delete("service")
   parsed.searchParams.delete("request")
   return parsed.toString()
+}
+
+function reprojectGeoJSON(data, fromEPSG) {
+  const from = `EPSG:${fromEPSG}`
+  const to = 'EPSG:4326'
+  const converted = data.features.map(feature => ({
+    ...feature,
+    geometry: {
+      ...feature.geometry,
+      coordinates: reprojectCoords(feature.geometry.coordinates, from, to)
+    }
+  }))
+  return { ...data, features: converted}
+}
+
+function reprojectCoords(coords, from, to) {
+  if (typeof coords[0] === 'number') {
+    return proj4(from, to, coords)
+  }
+  return coords.map(c => reprojectCoords(c, from, to))
 }
 
 export async function fetchCapabilities(url) {
@@ -15,7 +39,7 @@ export async function fetchCapabilities(url) {
   const response = await fetch(capUrl)
   //console.log(response.status)
   const text = await response.text()
-  console.log(text)
+  //console.log(text)
   const parser = new DOMParser()
   const xml = parser.parseFromString(text, 'application/xml')
   //console.log(xml.getElementsByTagNameNS('*', 'Operation')[0])
@@ -55,9 +79,18 @@ export async function fetchFeatures(url, layerName, outputFormats) {
   //const format = outputFormats.includes('application/geo+json') ? 'application/geo%2Bjson' : 'application/json'
   const format = outputFormats.values().next().value.replace('+', '%2B')
   const featureUrl = `${newUrl}${binding}SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${layerName}&outputFormat=${format}&SRSNAME=EPSG:4326&count=500`
+  
   //console.log(featureUrl)
   const response = await fetch(featureUrl)
   const data = await response.json()
-  console.log(data.crs)
+
+  const crs =  data.crs?.properties?.name
+  if (crs && !crs.includes('4326')) {
+    const epsgCode = crs.split('::')[1]
+    return reprojectGeoJSON(data, epsgCode)
+  }
+
   return data
+
+
 }
