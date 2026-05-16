@@ -4,7 +4,7 @@ import { fetchGeoJSON } from '../services/geojson.js'
 import MetaData from './metaData.jsx'
 import { readCSV } from '../services/csv.js'
 
-function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, activeLayers, removeLayer, updateColor, choropleths, setChoropleth }) {
+function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, activeLayers, removeLayer, updateColor, choropleths, setChoropleth, heatmaps, toggleHeatmap }) {
   const [url, setUrl] = useState('')
   const [layers, setLayers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -135,6 +135,13 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
                     ))}
                   </select>
                 </div> 
+              )}
+              {['Point', 'MultiPoint'].includes(layer.analysis?.geometryType) && (
+                <div style={{ padding: '0.4rem' }}>
+                  <button onClick={() => toggleHeatmap(layer.id)}>
+                    {heatmaps[layer.id] ? 'Heatmap deaktivieren' : 'Heatmap aktivieren'}
+                  </button>
+                </div>
               )}
               {expandedMeta[layer.id] && <MetaData layer={layer} />}
             </div> 

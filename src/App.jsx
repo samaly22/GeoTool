@@ -6,6 +6,7 @@ import AttributesTable from './components/attributesTable'
 import { fetchFeatures } from './services/wfs.js'
 import CollapsiblePanel from './components/collapsiblePanel'
 import TableView from './components/tableView.jsx'
+import HeatmapLayer from './components/heatmapLayer.jsx'
 import config from './config.json'
 
 
@@ -25,6 +26,7 @@ function App() {
 
     const [notification, setNotification] =  useState(null)
     const [choropleths, setChoropleths] = useState({})
+    const [heatmaps, setHeatmaps] = useState({})
 
     function addLayer(name, title, source, data, meta = null) {
         setLayers(prev => {
@@ -188,6 +190,10 @@ function App() {
         return `rgb(${r}, ${g}, 0)`
     }
 
+    function toggleHeatmap(layerId) {
+        setHeatmaps(prev => ({ ...prev, [layerId]: !prev[layerId] }))
+    }
+
     
 
     return (
@@ -202,6 +208,8 @@ function App() {
                 updateColor={updateLayerColor}
                 choropleths={choropleths}
                 setChoropleth={setChoropleth}
+                heatmaps={heatmaps}
+                toggleHeatmap={toggleHeatmap}
             />
             <div style={{ flex: 1, position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 1000 }}>
@@ -232,18 +240,31 @@ function App() {
                                 : []
                             const min = Math.min(...values)
                             const max = Math.max(...values)
+
+                            const isHeatmap = heatmaps[layer.id]
+                            const points = isHeatmap
+                                ? layer.data.features.map(f => [
+                                    f.geometry.coordinates[1],
+                                    f.geometry.coordinates[0]
+                                ])
+                                : []
                             return (
-                            <GeoJSON
-                                key={`${layer.id}-${layer.color}-${choroplethColumn}`}
-                                data={{ type:'FeatureCollection', features: layer.data.features }}
-                                style={feature => {
-                                    if (!choroplethColumn) return { color: layer.color, fillColor: layer.color, fillOpacity: 0.4 }
-                                    const value = feature.properties[choroplethColumn]
-                                    const color = getChoroplethColor(value, min, max)
-                                    return { color: layer.color, fillColor: color, fillOpacity: 0.7 }
-                                }}
-                                onEachFeature={onEachFeature}
-                            />
+                                <>
+                                    {!isHeatmap &&  
+                                    <GeoJSON
+                                        key={`${layer.id}-${layer.color}-${choroplethColumn}`}
+                                        data={{ type:'FeatureCollection', features: layer.data.features }}
+                                        style={feature => {
+                                            if (!choroplethColumn) return { color: layer.color, fillColor: layer.color, fillOpacity: 0.4 }
+                                            const value = feature.properties[choroplethColumn]
+                                            const color = getChoroplethColor(value, min, max)
+                                            return { color: layer.color, fillColor: color, fillOpacity: 0.7 }
+                                        }}
+                                        onEachFeature={onEachFeature}
+                                    />}
+                                    {isHeatmap && <HeatmapLayer key={layer.id} points={points} />}
+                                </>
+
                         )})}
                         <MapController selectedFeature={selectedFeature}
                                         selectedLayer={selectedLayer}
