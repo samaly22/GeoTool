@@ -52,7 +52,8 @@ Lokale CSV-Datei hochladen. EIne Spalte mit WKT-Geometrien wird automatisch erka
 
 - Kein Proj4js-Fallback für WFS-Server die EPSG:4326 ingnorieren
 - Styling und farbliche Unterscheidung der Layer noch nicht implementiert
-- Heatmap noch nicht implementiert
+- Heatmap, farbliche Tiefe bei speziellen Daten noch nicht implementiert
+- Zusammenfassung
 
 ---
 

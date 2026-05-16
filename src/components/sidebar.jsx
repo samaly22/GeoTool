@@ -4,7 +4,7 @@ import { fetchGeoJSON } from '../services/geojson.js'
 import MetaData from './metaData.jsx'
 import { readCSV } from '../services/csv.js'
 
-function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, activeLayers, removeLayer }) {
+function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, activeLayers, removeLayer, updateColor }) {
   const [url, setUrl] = useState('')
   const [layers, setLayers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -120,6 +120,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.4rem' }}>
                 <span>{layer.name}</span>
                 <div>
+                  <input type="color" value={layer.color} onChange={(e) => updateColor(layer.id, e.target.value)}></input>
                   <button onClick={() => setExpandedMeta(prev => ({ ...prev, [layer.id]: !prev[layer.id] }))}>ℹ</button>
                   <button onClick={() => removeLayer(layer.id)}>✕</button>
                 </div>

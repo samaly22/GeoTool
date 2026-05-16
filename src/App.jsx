@@ -22,12 +22,19 @@ function App() {
         setLayers(prev => {
             if (prev.some(l => l.name === name)) return prev
             const id = `layer-${Date.now()}`
-            return [ ...prev, { id, name, title, source, data, meta }]
+            const color = config.colors[prev.length % config.colors.length]
+            return [ ...prev, { id, name, title, source, data, meta, color }]
         })
     }
 
     function removeLayer(id) {
         setLayers(prev => prev.filter(l => l.id !== id))
+    }
+
+    function updateLayerColor(id, newColor) {
+        setLayers(prev => {
+            return prev.map(layer => layer.id === id ? { ...layer, color: newColor } : layer)
+        })
     }
 
     function handleGeoJSONLoad(data, name, url, source = 'geojson') {
@@ -153,6 +160,7 @@ function App() {
                 onDataLoad={handleGeoJSONLoad}
                 activeLayers={layers}
                 removeLayer={removeLayer}
+                updateColor={updateLayerColor}
             />            
             <MapContainer
                 center={[51.505, -0.39]}
@@ -165,8 +173,9 @@ function App() {
                 />
                 {layers.map(layer => (
                     <GeoJSON
-                        key={layer.id}
-                        data={{ type:'FeatureCollection', features: displayedFeatures }}
+                        key={`${layer.id}-${layer.color}`}
+                        data={{ type:'FeatureCollection', features: layer.data.features }}
+                        style={{ color: layer.color, fillColor: layer.color, fillOpacity: 0.4 }}
                         onEachFeature={onEachFeature}
                     />
                 ))}

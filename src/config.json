@@ -1,4 +1,5 @@
 {
     "dynamicTable": false,
-    "WFSnameKeys": ["Name", "name", "NAME", "bez", "bezeichnung", "title", "Title"]
+    "WFSnameKeys": ["Name", "name", "NAME", "bez", "bezeichnung", "title", "Title"],
+    "colors": ["#e63946", "#457b9d", "#2a9d8f", "#e9c46a", "#f4a261"]
 }
