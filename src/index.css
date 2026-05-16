@@ -1,0 +1,25 @@
+:root[data-theme="dark"] {
+    --bg-sidebar: #1e1e2e;
+    --bg-sidebar-item: #2a2a3e;
+    --text-primary: #cdd6f4;
+    --text-secondary: #a6adc8;
+    --accent: #89b4fa;
+    --border: #45475a;
+    --button-bg: #313244;
+    --button-hover: #45475a;
+    --notification-bg: #f9e2af;
+    --notification-text: #1e1e2e;
+}
+
+:root[data-theme="light"] {
+    --bg-sidebar: #f4f4f4;
+    --bg-sidebar-item: #ffffff;
+    --text-primary: #1e1e2e;
+    --text-secondary: #4c4f69;
+    --accent: #1d6fb5;
+    --border: #ccd0da;
+    --button-bg: #e0e0e0;
+    --button-hover: #c8c8c8;
+    --notification-bg: #f4c430;
+    --notification-text: #1e1e2e;
+}

@@ -28,6 +28,14 @@ function App() {
     const [choropleths, setChoropleths] = useState({})
     const [heatmaps, setHeatmaps] = useState({})
 
+    const [theme, setTheme] = useState('dark')
+
+    function toggleTheme() {
+        const next = theme === 'dark' ? 'light' : 'dark'
+        setTheme(next)
+        document.documentElement.setAttribute('data-theme', next)
+        }
+
     function addLayer(name, title, source, data, meta = null) {
         setLayers(prev => {
             if (prev.some(l => l.name === name)) return prev
