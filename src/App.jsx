@@ -240,7 +240,7 @@ function App() {
                                     if (!choroplethColumn) return { color: layer.color, fillColor: layer.color, fillOpacity: 0.4 }
                                     const value = feature.properties[choroplethColumn]
                                     const color = getChoroplethColor(value, min, max)
-                                    return { color, fillColor: color, fillOpacity: 0.7 }
+                                    return { color: layer.color, fillColor: color, fillOpacity: 0.7 }
                                 }}
                                 onEachFeature={onEachFeature}
                             />
