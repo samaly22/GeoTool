@@ -67,6 +67,9 @@ function App() {
             if (analysis.numericColumns.length > 0  && ['Polygon', 'MultiPolygon'].includes(analysis.geometryType)) {
                 showNotification(`Layer "${layer.title}" eignet sich für eine Choroplethenkarte.`)
             }
+            if (analysis?.geometryType === 'Point' || analysis?.geometryType === 'MultiPolygon') {
+                showNotification(`Layer "${layer.title}" eignet sich für eine Heatmap.`)
+            }
             //console.log(layers)
             setVisibleFeatures(data.features)
         } catch (e) {
@@ -175,8 +178,9 @@ function App() {
     }
 
     function showNotification(message) {
-        setNotification(message)
-        setTimeout(() => setNotification(null), 5000)
+        const id = Date.now()
+        setNotification(prev => [...(prev || []), { id, message }])
+        setTimeout(() => setNotification(prev => prev.filter(n => n.id !== id)), 5000)
     }
 
     function setChoropleth(layerId, column) {
@@ -218,11 +222,11 @@ function App() {
                 </div>
                 {view === 'map' && (
                     <>
-                    {notification && (
-                        <div style={{ position: 'absolute', top: '4rem', right: '1rem', zIndex: 1000, background: '#f4c430', padding: '0.75rem 1rem', borderRadius: '6px' }}>
-                            {notification}
+                    {notification && notification.map(n => (
+                        <div key={n.id} style={{ position: 'absolute', top: '4rem', right: '1rem', zIndex: 1000, background: '#f4c430', padding: '0.75rem 1rem', borderRadius: '6px' }}>
+                            {n.message}
                         </div>
-                    )}
+                    ))}
                     <MapContainer
                         center={[51.505, -0.39]}
                         zoom={5}
