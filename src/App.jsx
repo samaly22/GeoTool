@@ -187,11 +187,9 @@ function App() {
         setChoropleths(prev => ({ ...prev, [layerId]: column}))
     }
 
-    function getChoroplethColor(value, min, max) {
-        const t = (value - min) / (max - min)
-        const r = Math.round(255 * t)
-        const g = Math.round(255 * (1-t))
-        return `rgb(${r}, ${g}, 0)`
+    function getChoroplethOpacity(value, min, max) {
+        if (max === min) return 0.7
+        return 0.05 + 0.9 * ((value - min) / (max - min))
     }
 
     function toggleHeatmap(layerId) {
@@ -261,8 +259,8 @@ function App() {
                                         style={feature => {
                                             if (!choroplethColumn) return { color: layer.color, fillColor: layer.color, fillOpacity: 0.4 }
                                             const value = feature.properties[choroplethColumn]
-                                            const color = getChoroplethColor(value, min, max)
-                                            return { color: layer.color, fillColor: color, fillOpacity: 0.7 }
+                                            const opacity = getChoroplethOpacity(value, min, max)
+                                            return { color: layer.color, fillColor: layer.color, fillOpacity: opacity }
                                         }}
                                         onEachFeature={onEachFeature}
                                     />}
