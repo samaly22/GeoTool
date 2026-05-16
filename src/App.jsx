@@ -5,7 +5,9 @@ import Sidebar from './components/sidebar'
 import AttributesTable from './components/attributesTable'
 import { fetchFeatures } from './services/wfs.js'
 import CollapsiblePanel from './components/collapsiblePanel'
+import TableView from './components/tableView.jsx'
 import config from './config.json'
+
 
 function App() {
     const [hoveredFeature, setHoveredFeature] = useState(null)
@@ -17,6 +19,9 @@ function App() {
     const [isFiltered, setIsFiltered] = useState(false)
     const [layers, setLayers] = useState([])
     const [wfsUrl, setWfsUrl] = useState('')
+
+    const [view, setView] = useState('map')
+    const [activeTableLayer, setActiveTableLayer] = useState(null)
 
     function addLayer(name, title, source, data, meta = null) {
         setLayers(prev => {
@@ -161,34 +166,53 @@ function App() {
                 activeLayers={layers}
                 removeLayer={removeLayer}
                 updateColor={updateLayerColor}
-            />            
-            <MapContainer
-                center={[51.505, -0.39]}
-                zoom={5}
-                style={{ flex: 1 }}
-            >
-                <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution="© OpenStreetMap contributors"
-                />
-                {layers.map(layer => (
-                    <GeoJSON
-                        key={`${layer.id}-${layer.color}`}
-                        data={{ type:'FeatureCollection', features: layer.data.features }}
-                        style={{ color: layer.color, fillColor: layer.color, fillOpacity: 0.4 }}
-                        onEachFeature={onEachFeature}
-                    />
-                ))}
-                <MapController selectedFeature={selectedFeature}
-                                selectedLayer={selectedLayer}
-                                setSelectedFeature={setSelectedFeature}
-                                setSelectedLayer={setSelectedLayer} 
-                                geoData={layers}
-                                setVisibleFeatures={setVisibleFeatures} />
-            </MapContainer>
-            <CollapsiblePanel>
-                <AttributesTable features={displayedFeatures} handleOnClick={handleFeatureClick} filterableFIDs={filterableFIDs} setFilterableFIDs={setFilterableFIDs} isFiltered={isFiltered} setIsFiltered={setIsFiltered} change={change} selectAll={selectAll}/>
-            </CollapsiblePanel>
+            />
+            <div style={{ flex: 1, position: 'relative' }}>
+                <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 1000 }}>
+                    <button onClick={() => setView('map')}>🗺️</button>
+                    <button onClick={() => setView('table')}>📋</button>
+                </div>
+                {view === 'map' && (
+                    <>
+                    <MapContainer
+                        center={[51.505, -0.39]}
+                        zoom={5}
+                        style={{ height: '100vh' }}
+                    >
+                        <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution="© OpenStreetMap contributors"
+                        />
+                        {layers.map(layer => (
+                            <GeoJSON
+                                key={`${layer.id}-${layer.color}`}
+                                data={{ type:'FeatureCollection', features: layer.data.features }}
+                                style={{ color: layer.color, fillColor: layer.color, fillOpacity: 0.4 }}
+                                onEachFeature={onEachFeature}
+                            />
+                        ))}
+                        <MapController selectedFeature={selectedFeature}
+                                        selectedLayer={selectedLayer}
+                                        setSelectedFeature={setSelectedFeature}
+                                        setSelectedLayer={setSelectedLayer} 
+                                        geoData={layers}
+                                        setVisibleFeatures={setVisibleFeatures} />
+                    </MapContainer>
+                    <div style={{ position: 'absolute', bottom: 0, right: 0, zIndex: 1000 }}> 
+                        <CollapsiblePanel>
+                            <AttributesTable features={displayedFeatures} handleOnClick={handleFeatureClick} filterableFIDs={filterableFIDs} setFilterableFIDs={setFilterableFIDs} isFiltered={isFiltered} setIsFiltered={setIsFiltered} change={change} selectAll={selectAll}/>
+                        </CollapsiblePanel>
+                    </div>
+
+                    </>
+                )}
+                {view === 'table' && (
+                    <div style={{ height: '100%', overflowY: 'auto'}} >
+                        <TableView layers={layers} activeTableLayer={activeTableLayer} setActiveTableLayer={setActiveTableLayer} />
+                    </div>
+                )}
+            </div>            
+
         </div>    
     )
     
