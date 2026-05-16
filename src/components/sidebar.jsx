@@ -4,7 +4,7 @@ import { fetchGeoJSON } from '../services/geojson.js'
 import MetaData from './metaData.jsx'
 import { readCSV } from '../services/csv.js'
 
-function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, activeLayers, removeLayer, updateColor }) {
+function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, activeLayers, removeLayer, updateColor, choropleths, setChoropleth }) {
   const [url, setUrl] = useState('')
   const [layers, setLayers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -125,6 +125,17 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
                   <button onClick={() => removeLayer(layer.id)}>✕</button>
                 </div>
               </div>
+              {layer.analysis?.numericColumns.length > 0 &&
+              ['Polygon', 'MultiPolygon'].includes(layer.analysis?.geometryType) && (
+                <div style={{ padding: '0.4rem' }}>
+                  <select onChange={(e) => setChoropleth(layer.id, e.target.value)} defaultValue="">
+                    <option value="" disabled>Spalte wählen...</option>
+                    {layer.analysis.numericColumns.map(col => (
+                      <option key={col} value={col}>{col}</option>
+                    ))}
+                  </select>
+                </div> 
+              )}
               {expandedMeta[layer.id] && <MetaData layer={layer} />}
             </div> 
           ))}

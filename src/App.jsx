@@ -23,6 +23,9 @@ function App() {
     const [view, setView] = useState('map')
     const [activeTableLayer, setActiveTableLayer] = useState(null)
 
+    const [notification, setNotification] =  useState(null)
+    const [choropleths, setChoropleths] = useState({})
+
     function addLayer(name, title, source, data, meta = null) {
         setLayers(prev => {
             if (prev.some(l => l.name === name)) return prev
@@ -57,7 +60,11 @@ function App() {
             setSelectedLayer(layer)
             //setMetaLayer({ ...layer, url: wfsUrl })
             const data = await fetchFeatures(wfsUrl, layer.name, layer.formats)
+            const analysis = analyzeLayer(data)
             addLayer(layer.name, layer.title, 'wfs', data, { ...layer, url: wfsUrl})
+            if (analysis.numericColumns.length > 0  && ['Polygon', 'MultiPolygon'].includes(analysis.geometryType)) {
+                showNotification(`Layer "${layer.title}" eignet sich für eine Choroplethenkarte.`)
+            }
             //console.log(layers)
             setVisibleFeatures(data.features)
         } catch (e) {
@@ -165,6 +172,22 @@ function App() {
         return { geometryType, numericColumns }
     }
 
+    function showNotification(message) {
+        setNotification(message)
+        setTimeout(() => setNotification(null), 5000)
+    }
+
+    function setChoropleth(layerId, column) {
+        setChoropleths(prev => ({ ...prev, [layerId]: column}))
+    }
+
+    function getChoroplethColor(value, min, max) {
+        const t = (value - min) / (max - min)
+        const r = Math.round(255 * t)
+        const g = Math.round(255 * (1-t))
+        return `rgb(${r}, ${g}, 0)`
+    }
+
     
 
     return (
@@ -177,6 +200,8 @@ function App() {
                 activeLayers={layers}
                 removeLayer={removeLayer}
                 updateColor={updateLayerColor}
+                choropleths={choropleths}
+                setChoropleth={setChoropleth}
             />
             <div style={{ flex: 1, position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 1000 }}>
@@ -185,6 +210,11 @@ function App() {
                 </div>
                 {view === 'map' && (
                     <>
+                    {notification && (
+                        <div style={{ position: 'absolute', top: '4rem', right: '1rem', zIndex: 1000, background: '#f4c430', padding: '0.75rem 1rem', borderRadius: '6px' }}>
+                            {notification}
+                        </div>
+                    )}
                     <MapContainer
                         center={[51.505, -0.39]}
                         zoom={5}
@@ -194,14 +224,27 @@ function App() {
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             attribution="© OpenStreetMap contributors"
                         />
-                        {layers.map(layer => (
+                        {layers.map(layer => {
+                            const choroplethColumn = choropleths[layer.id]
+                            const features = layer.data.features
+                            const values = choroplethColumn
+                                ? features.map(f => f.properties[choroplethColumn]).filter(v => v != null)
+                                : []
+                            const min = Math.min(...values)
+                            const max = Math.max(...values)
+                            return (
                             <GeoJSON
-                                key={`${layer.id}-${layer.color}`}
+                                key={`${layer.id}-${layer.color}-${choroplethColumn}`}
                                 data={{ type:'FeatureCollection', features: layer.data.features }}
-                                style={{ color: layer.color, fillColor: layer.color, fillOpacity: 0.4 }}
+                                style={feature => {
+                                    if (!choroplethColumn) return { color: layer.color, fillColor: layer.color, fillOpacity: 0.4 }
+                                    const value = feature.properties[choroplethColumn]
+                                    const color = getChoroplethColor(value, min, max)
+                                    return { color, fillColor: color, fillOpacity: 0.7 }
+                                }}
                                 onEachFeature={onEachFeature}
                             />
-                        ))}
+                        )})}
                         <MapController selectedFeature={selectedFeature}
                                         selectedLayer={selectedLayer}
                                         setSelectedFeature={setSelectedFeature}
