@@ -233,17 +233,19 @@ function App() {
                 moveLayer={moveLayer}
             />
             <div style={{ flex: 1, position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 1000 }}>
+                <div className="toolbar">
                     <button onClick={() => setView('map')}>🗺️</button>
                     <button onClick={() => setView('table')}>📋</button>
                 </div>
                 {view === 'map' && (
                     <>
+                    <div className="notification-container">
                     {notification && notification.map(n => (
-                        <div key={n.id} style={{ position: 'absolute', top: '4rem', right: '1rem', zIndex: 1000, background: '#f4c430', padding: '0.75rem 1rem', borderRadius: '6px' }}>
+                        <div className="notification" key={n.id}>
                             {n.message}
                         </div>
                     ))}
+                    </div>
                     <MapContainer
                         center={[51.505, -0.39]}
                         zoom={5}
