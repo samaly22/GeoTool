@@ -34,24 +34,28 @@ function TableView({ layers, activeTableLayer, setActiveTableLayer }) {
     }
 
     return (
-        <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', borderBottom: '1px solid #ccc' }}>
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg-sidebar)' }}>
+            <div style={{ display: 'flex', borderBottom: '1px solid var(--border)' }}>
                 {layers.map(layer => (
                     <button
                         key={layer.id}
                         onClick={() => setActiveTableLayer(layer.id)}
-                        style={{ padding: '0.5rem 1rem', fontWeight: layer.id === currentLayer.id ? 'bold' : 'normal' }}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            fontWeight: layer.id === currentLayer.id ? 'bold' : 'normal',
+                            borderBottom: layer.id === currentLayer.id ? '2px solid var(--accent)' : '2px solid transparent',
+                            color: layer.id === currentLayer.id ? 'var(--accent)' : 'var(--text-secondary)' }}
                     >
                         {layer.title}
                     </button>    
                 ))}
             </div>
-            <div style={{overflowY: 'auto', flex: 1}}>
+            <div style={{overflowY: 'auto', flex: 1, padding: '0.5rem'}}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                         <tr>
                             {columns.map(col => (
-                                <th key={col} onClick={() => handleSort(col)} style={{ cursor: 'pointer', padding: '0.5rem', borderBottom: '1px solid #ccc', textAlign: 'left' }}>
+                                <th key={col} onClick={() => handleSort(col)} style={{ cursor: 'pointer' }}>
                                     {col} {sortKey === col ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
                                 </th>
                             ))}
@@ -61,7 +65,7 @@ function TableView({ layers, activeTableLayer, setActiveTableLayer }) {
                         {sorted.map((feature, index) => (
                             <tr key={index}>
                                 {columns.map(col => (
-                                    <td key={col} style={{ padding: '0.4rem', borderBottom:'1px solid #eee' }}>
+                                    <td key={col}>
                                         {feature.properties[col]}
                                     </td>
                                 ))}
