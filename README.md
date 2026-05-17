@@ -20,14 +20,15 @@ Die Anwendung ist danach unter `http://localhost:5173` erreichbar.
 
 ## Beispieldateien
 
-Wetterdaten:
-https://maps.dwd.de/geoserver/dwd/ows
+[Wetterdaten](https://maps.dwd.de/geoserver/dwd/ows)
 
-Bahnhöfe in Dresden:
-https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=62&service=wfs&request=getcapabilities
+[Bahnhöfe in Dresden](https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=62&service=wfs&request=getcapabilities)
 
-Elbe-Überschwemmfläche:
-https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=1371&service=wfs&request=getcapabilities
+[Elbe-Überschwemmfläche](https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=1371&service=wfs&request=getcapabilities)
+
+[Arbeitslosigkeit Dresden](https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=541&service=wfs&request=getcapabilities)
+
+[Barrierefreie Haltestellen Dresden](https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=1593&service=wfs&request=getcapabilities)
 
 ## Unterstützte Datenquellen
 
@@ -42,18 +43,17 @@ Lokale CSV-Datei hochladen. EIne Spalte mit WKT-Geometrien wird automatisch erka
 
 ## Funktionen
 
-- Mehrere Layer gelichzeitig aus unterschiedlichen Quellen anzeigen
-- Layer einzeln entfernen
+- Mehrere Layer gleichzeitig aus unterschiedlichen Quellen anzeigen
+- Layer einzeln entfernen, einfärben und Reihenfolge verändern
 - Metadaten pro Layer ausklappbar in der Sidebar
-- (dynamische) Attributstabelle mit Filterung
-- Klick auf Feature in Tabelle zoomt die Karte
+- Visualisierungsformen und deren Erkennung [Choropleth und Heatmap]
+- (dynamische) Attributstabelle mit Filterung und Zoom auf Feature
+- Tabellenansicht mit Sortierung pro Layer
+- Dark/Light Mode
 
 ## Bekannte Einschränkungen
 
-- Kein Proj4js-Fallback für WFS-Server die EPSG:4326 ingnorieren
-- Styling und farbliche Unterscheidung der Layer noch nicht implementiert
-- Heatmap, farbliche Tiefe bei speziellen Daten noch nicht implementiert
-- Zusammenfassung
+- Keine Zusammenfassung pro Spalte Datensatz
 
 ---
 
@@ -68,6 +68,7 @@ Lokale CSV-Datei hochladen. EIne Spalte mit WKT-Geometrien wird automatisch erka
 | [Proj4js](https://github.com/proj4js/proj4js) | MIT |
 | [proj4leaflet](https://github.com/kartena/Proj4Leaflet) | MIT |
 | [wellknown](https://github.com/mapbox/wellknown) | MIT |
+| [leaflet.heat](https://github.com/Leaflet/Leaflet.heat) | MIT |
 
 ---
 
@@ -95,14 +96,17 @@ The application is then accessible at `http://localhost:5173`.
 
 ## Sample Files
 
-Weather data:
-https://maps.dwd.de/geoserver/dwd/ows
+[Weather data](https://maps.dwd.de/geoserver/dwd/ows)
 
-Train stations in Dresden:
-https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=62&service=wfs&request=getcapabilities
+[Train stations in Dresden](https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=62&service=wfs&request=getcapabilities)
 
-Elbe floodplain:
-https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=1371&service=wfs&request=getcapabilities
+[Elbe floodplain](https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=1371&service=wfs&request=getcapabilities)
+
+[Unemployment in Dresden](https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=541&service=wfs&request=getcapabilities)
+
+[Accessible bus stops in Dresden](https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=1593&service=wfs&request=getcapabilities)
+
+Translated with DeepL.com (free version)
 
 ## Supported Data Sources
 
@@ -118,16 +122,16 @@ Upload a local CSV file. A column containing WKT geometries is automatically det
 ## Features
 
 - Display multiple layers simultaneously from different sources
-- Remove layers individually
-- Expandable metadata per layer in the sidebar
-- (Dynamic) attribute table with filtering
-- Clicking on a feature in the table zooms the map
+- Remove, color, and reorder layers individually
+- Expandable metadata for each layer in the sidebar
+- Visualization types and their recognition [Choropleth and Heatmap]
+- (Dynamic) attribute table with filtering and zoom to feature
+- Table view with sorting by layer
+- Dark/Light Mode
 
 ## Known Limitations
 
-- No Proj4js fallback for WFS servers that ignore EPSG:4326
-- Styling and color coding for layers not yet implemented
-- Heatmap not yet implemented
+- No summary per column in the dataset
 
 ---
 
@@ -142,3 +146,4 @@ Upload a local CSV file. A column containing WKT geometries is automatically det
 | [Proj4js](https://github.com/proj4js/proj4js) | MIT |
 | [proj4leaflet](https://github.com/kartena/Proj4Leaflet) | MIT |
 | [wellknown](https://github.com/mapbox/wellknown) | MIT |
+| [leaflet.heat](https://github.com/Leaflet/Leaflet.heat) | MIT |
