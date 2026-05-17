@@ -66,7 +66,9 @@ function TableView({ layers, activeTableLayer, setActiveTableLayer }) {
                             <tr key={index}>
                                 {columns.map(col => (
                                     <td key={col}>
-                                        {feature.properties[col]}
+                                        {typeof feature.properties[col] === 'string' && feature.properties[col].startsWith('<')
+                                            ? '[HTML]'
+                                        : feature.properties[col]}
                                     </td>
                                 ))}
                             </tr>

@@ -234,7 +234,7 @@ function App() {
                 toggleHeatmap={toggleHeatmap}
                 moveLayer={moveLayer}
             />
-            <div style={{ flex: 1, position: 'relative' }}>
+            <div style={{ flex: 1, position: 'relative', minWidth: 0, overflow: 'hidden' }}>
                 <div className="toolbar">
                     <button onClick={() => setView('map')}>🌍︎</button>
                     <button onClick={() => setView('table')}>▦</button>
