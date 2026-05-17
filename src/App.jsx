@@ -303,7 +303,7 @@ function App() {
                                         setVisibleFeatures={setVisibleFeatures} />
                     </MapContainer>
                     <div style={{ position: 'absolute', bottom: 0, right: 0, zIndex: 1000 }}> 
-                        <CollapsiblePanel>
+                        <CollapsiblePanel hasData={layers.length > 0}>
                             <AttributesTable features={displayedFeatures} handleOnClick={handleFeatureClick} filterableFIDs={filterableFIDs} setFilterableFIDs={setFilterableFIDs} isFiltered={isFiltered} setIsFiltered={setIsFiltered} change={change} selectAll={selectAll}/>
                         </CollapsiblePanel>
                     </div>

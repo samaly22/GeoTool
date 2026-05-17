@@ -7,16 +7,22 @@ function AttributesTable({ features, handleOnClick, filterableFIDs, setFilterabl
     }
 
     return (
-        <div style={{ width: 'auto', height: '100vh', padding: '1rem', overflowY: 'auto', background: '#f4f4f4' }}>
+        <div style={{
+            width: '350px',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            background: 'var(--bg-sidebar)',
+            border: '1px solid var(--border)',
+            padding: '0.75rem' }}>
             <h2>Übersicht</h2>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label>
-                    <input
-                    type="checkbox"
-                    checked={(filterableFIDs.length == features.length)} // Kontrolliert den Zustand
-                    onChange={(e) => selectAll()} // Behandelt Änderungen
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <input type="checkbox"
+                        checked={(filterableFIDs.length == features.length)} // Kontrolliert den Zustand
+                        onChange={(e) => selectAll()} // Behandelt Änderungen
                     />
-                </label>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Alle</span>
+                </div>
                 <button onClick={() => {if (filterableFIDs.length != 0) setIsFiltered(!isFiltered)}}>
                     {isFiltered ? 'Filter auflösen' : 'Filtern'}
                 </button>
@@ -26,33 +32,34 @@ function AttributesTable({ features, handleOnClick, filterableFIDs, setFilterabl
                     onClick={() => {
                         console.log('Klick')
                         handleOnClick(feature)}}
-                    style={{ marginBottom: '0.75rem',
-                                padding: '0.75rem',
-                                background: '#f4f4f4',
-                                border: '1px solid #ddd',
-                                borderRadius: '6px',
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.08'}}>
-                    <div onClick={(e) => e.stopPropagation()}>
-                        <label>
-                            <input
-                            type="checkbox"
-                            checked={filterableFIDs.includes(feature.id)} // Kontrolliert den Zustand
-                            onChange={(e) => change(feature.id)} // Behandelt Änderungen
-                            />
-                        </label>
+                    style={{marginBottom: '0.75rem',
+                            padding: '0.75rem',
+                            background: 'var(--bg-sidebar-item)',
+                            border: '1px solid var(--border)',
+                            borderRadius: '6px',
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: '0.5rem' }}
+                >
+                    <div onClick={(e) => e.stopPropagation()} style={{ paddingTop: '0.2rem' }}>
+                        <input
+                        type="checkbox"
+                        checked={filterableFIDs.includes(feature.id)} // Kontrolliert den Zustand
+                        onChange={(e) => change(feature.id)} // Behandelt Änderungen
+                        />
                     </div>
                     <table>
                         <thead>
                             <tr>
-                                <th style={{ textAlign: 'left', padding: '0.25rem', color: '#666' }}>Key</th>
-                                <th style={{ textAlign: 'left', padding: '0.25rem', color: '#666' }}>Value</th>
+                                <th>Key</th>
+                                <th>Value</th>
                             </tr>
                         </thead>
                         <tbody>
                             { (Object.entries(feature.properties)).map(([key, value]) =>
                             <tr key={key}>
-                                <td style={{ padding: '0.25rem', color: '#444', fontWeight: 'bold' }}>{key}</td>
-                                <td style={{ padding: '0.25rem', color: '#666' }}>{value}</td>
+                                <td style={{ fontWeight: 'bold' }}>{key}</td>
+                                <td>{value}</td>
                             </tr>
                             )}            
                         </tbody>
