@@ -107,7 +107,7 @@ function App() {
             const lower = selectedLayer.boundingBox.lowerCorner.split(' ')
             const upper = selectedLayer.boundingBox.upperCorner.split(' ')
             map.fitBounds([[lower[1], lower[0]], [upper[1], upper[0]]], { animate: true, duration: 2 })
-            setTimeout(() => map.invalidateSize(), 300)
+            setTimeout(() => map.invalidateSize(), 30000)
             console.log('lower:', lower, 'upper:', upper)
             setSelectedLayer(null)
         }, [selectedLayer])
