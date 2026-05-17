@@ -1,3 +1,4 @@
+import React from 'react'
 import { useEffect, useState } from 'react'
 import L from 'leaflet'
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet'
@@ -129,8 +130,9 @@ function App() {
 
     }
 
-    //const displayedFeatures = isFiltered ? visibleFeatures.filter(f => filterableFIDs.includes(f.id)) : visibleFeatures
-    const displayedFeatures = layers.flatMap(l => l.data?.features ?? [])
+    const displayedFeatures = isFiltered
+        ? layers.flatMap(l => l.data?.features ?? []).filter(f => filterableFIDs.includes(f.id))
+        : layers.flatMap(l => l.data?.features ?? [])
 
     function selectAll() {
         setIsFiltered(false)
@@ -273,11 +275,12 @@ function App() {
                                 ])
                                 : []
                             return (
-                                <>
-                                    {!isHeatmap &&  
+                                <React.Fragment key={layer.id}>
+                                    {!isHeatmap &&  isFiltered && (
                                     <GeoJSON
-                                        key={`${layer.id}-${layer.color}-${choroplethColumn}`}
-                                        data={{ type:'FeatureCollection', features: layer.data.features }}
+                                        key={`${layer.id}-${layer.color}-${filterableFIDs.join()}`}
+                                        data={{ type:'FeatureCollection',
+                                                features: layer.data.features.filter(f => filterableFIDs.includes(f.id)) }}
                                         pointToLayer={(feature, latlng) => L.circleMarker(latlng, {
                                             radius: 6,
                                             color: layer.color,
@@ -291,9 +294,28 @@ function App() {
                                             return { color: layer.color, fillColor: layer.color, fillOpacity: opacity }
                                         }}
                                         onEachFeature={onEachFeature}
-                                    />}
+                                    />)}
+                                    {!isHeatmap &&  !isFiltered && (
+                                    <GeoJSON
+                                        key={`${layer.id}-${layer.color}-${choroplethColumn}`}
+                                        data={{ type:'FeatureCollection',
+                                                features: layer.data.features }}
+                                        pointToLayer={(feature, latlng) => L.circleMarker(latlng, {
+                                            radius: 6,
+                                            color: layer.color,
+                                            fillColor: layer.color,
+                                            fillOpacity: 0.7
+                                        })}
+                                        style={feature => {
+                                            if (!choroplethColumn) return { color: layer.color, fillColor: layer.color, fillOpacity: 0.4 }
+                                            const value = feature.properties[choroplethColumn]
+                                            const opacity = getChoroplethOpacity(value, min, max)
+                                            return { color: layer.color, fillColor: layer.color, fillOpacity: opacity }
+                                        }}
+                                        onEachFeature={onEachFeature}
+                                    />)}
                                     {isHeatmap && <HeatmapLayer key={layer.id} points={points} />}
-                                </>
+                                </React.Fragment>
 
                         )})}
                         <MapController selectedFeature={selectedFeature}
