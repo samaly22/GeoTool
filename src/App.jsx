@@ -234,8 +234,9 @@ function App() {
             />
             <div style={{ flex: 1, position: 'relative' }}>
                 <div className="toolbar">
-                    <button onClick={() => setView('map')}>🗺️</button>
-                    <button onClick={() => setView('table')}>📋</button>
+                    <button onClick={() => setView('map')}>🌍︎</button>
+                    <button onClick={() => setView('table')}>▦</button>
+                    <button onClick={toggleTheme}>{theme === 'dark' ? '☀' : '🌙︎'}</button>
                 </div>
                 {view === 'map' && (
                     <>
