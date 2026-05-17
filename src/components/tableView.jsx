@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 function TableView({ layers, activeTableLayer, setActiveTableLayer }) {
-    if (!layers) {
+    if (!layers || layers.length === 0) {
         return (
             <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                 <p>Keine Daten geladen. Wähle einen Datensatz aus.</p>
