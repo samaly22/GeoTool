@@ -8,7 +8,7 @@ function CollapsiblePanel ({ children, hasData }) {
     }
 
     return (
-        <div style={{display: 'flex', flexDirection: 'column-reverse', alignItems: 'flex-start', alignSelf: 'flex-start' }}>
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', alignSelf: 'flex-start' }}>
             <button onClick={() => hasData && setIsOpen(!isOpen)} style={{
                 padding: '1rem 0.5rem',
                 background: 'var(--button-bg)',
