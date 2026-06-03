@@ -1,5 +1,5 @@
 import React from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import L from 'leaflet'
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet'
 import Sidebar from './components/sidebar'
@@ -9,6 +9,65 @@ import CollapsiblePanel from './components/collapsiblePanel'
 import TableView from './components/tableView.jsx'
 import HeatmapLayer from './components/heatmapLayer.jsx'
 import config from './config.json'
+
+function MapController({ selectedFeature, selectedLayer, setSelectedFeature, setSelectedLayer, setVisibleFeatures, view, layers }) {
+    const map = useMap()
+    const hasZoomed = useRef(false)
+
+    useMapEvents({
+        moveend: () => {
+            if (!config.dynamicTable) return
+            if (!layers) return
+            const bounds = map.getBounds()
+            const allFeatures = layers.flatMap(l => l.data.features ?? [])
+            const features = allFeatures.filter(feature =>
+                bounds.contains([feature.geometry.coordinates[1], feature.geometry.coordinates[0]])
+            )
+            setVisibleFeatures(features)
+    }})
+
+    // Zoomen bei Layerauswahl
+    useEffect(() => {
+        if (!selectedLayer) return
+        const lower = selectedLayer.boundingBox.lowerCorner.split(' ')
+        const upper = selectedLayer.boundingBox.upperCorner.split(' ')
+        map.fitBounds([[lower[1], lower[0]], [upper[1], upper[0]]], { animate: true, duration: 2 })
+        setTimeout(() => map.invalidateSize(), 30000)
+        console.log('lower:', lower, 'upper:', upper)
+        setSelectedLayer(null)
+    }, [selectedLayer])
+    
+
+    // Zoomen auf ausgewähltes Feature
+    useEffect(() => {
+        if (!selectedFeature) return
+        if (selectedFeature.geometry.type === 'Point') {
+            const [lng, lat] = selectedFeature.geometry.coordinates
+            map.flyTo([lat, lng], 12)
+        } else {
+            const bounds = L.geoJSON(selectedFeature).getBounds()
+            map.fitBounds(bounds)
+        }
+        map.invalidateSize()
+        setSelectedFeature(null)
+    }, [selectedFeature])
+
+    useEffect(() => {
+        if (view !== "map") {
+            hasZoomed.current = false
+            return
+        }
+        if (hasZoomed.current) return
+        setTimeout(() => {
+            map.invalidateSize()
+            const allFeatures = layers.flatMap(l => l.data?.features ?? [])
+            if (allFeatures.length === 0) return
+            const bounds = L.geoJSON({ type: 'FeatureCollection', features: allFeatures }).getBounds()
+            map.fitBounds(bounds, { animate: true })
+            hasZoomed.current = true
+        }, 100)
+    }, [view])
+}
 
 
 function App() {
@@ -43,7 +102,7 @@ function App() {
             const id = `layer-${Date.now()}`
             const color = config.colors[prev.length % config.colors.length]
             const analysis = analyzeLayer(data)
-            return [ ...prev, { id, name, title, source, data, meta, color, analysis }]
+            return [{ id, name, title, source, data, meta, color, analysis }, ...prev]
         })
     }
 
@@ -85,59 +144,6 @@ function App() {
             console.error('Fehler beim Laden des Layers:', e)
         }
         // console.log('Gewählter Layer:', layer)
-    }
-
-    function MapController({ selectedFeature, selectedLayer, setSelectedFeature, setSelectedLayer, geoData, setVisibleFeatures }) {
-        const map = useMap()
-
-        useMapEvents({
-            moveend: () => {
-                if (!config.dynamicTable) return
-                if (!layers) return
-                const bounds = map.getBounds()
-                const allFeatures = layers.flatMap(l => l.data.features ?? [])
-                const features = allFeatures.filter(feature =>
-                    bounds.contains([feature.geometry.coordinates[1], feature.geometry.coordinates[0]])
-                )
-                setVisibleFeatures(features)
-        }})
-
-        // Zoomen bei Layerauswahl
-        useEffect(() => {
-            if (!selectedLayer) return
-            const lower = selectedLayer.boundingBox.lowerCorner.split(' ')
-            const upper = selectedLayer.boundingBox.upperCorner.split(' ')
-            map.fitBounds([[lower[1], lower[0]], [upper[1], upper[0]]], { animate: true, duration: 2 })
-            setTimeout(() => map.invalidateSize(), 30000)
-            console.log('lower:', lower, 'upper:', upper)
-            setSelectedLayer(null)
-        }, [selectedLayer])
-        
-
-        // Zoomen auf ausgewähltes Feature
-        useEffect(() => {
-            if (!selectedFeature) return
-            if (selectedFeature.geometry.type === 'Point') {
-                const [lng, lat] = selectedFeature.geometry.coordinates
-                map.flyTo([lat, lng], 12)
-            } else {
-                const bounds = L.geoJSON(selectedFeature).getBounds()
-                map.fitBounds(bounds)
-            }
-            map.invalidateSize()
-            setSelectedFeature(null)
-        }, [selectedFeature])
-
-        useEffect(() => {
-            if (view !== "map") return
-            setTimeout(() => {
-                map.invalidateSize()
-                const allFeatures = layers.flatMap(l => l.data?.features ?? [])
-                if (allFeatures.length === 0) return
-                const bounds = L.geoJSON({ type: 'FeatureCollection', features: allFeatures }).getBounds()
-                map.fitBounds(bounds, { animate: true })
-            }, 100)
-        }, [view])
     }
 
     const displayedFeatures = isFiltered
@@ -268,7 +274,7 @@ function App() {
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             attribution="© OpenStreetMap contributors"
                         />
-                        {layers.map(layer => {
+                        {[...layers].reverse().map((layer, index) => {
                             const choroplethColumn = choropleths[layer.id]
                             const features = layer.data.features
                             const values = choroplethColumn
@@ -285,7 +291,7 @@ function App() {
                                 ])
                                 : []
                             return (
-                                <React.Fragment key={layer.id}>
+                                <React.Fragment key={`${layer.id}-${index}`}>
                                     {!isHeatmap &&  isFiltered && (
                                     <GeoJSON
                                         key={`${layer.id}-${layer.color}-${filterableFIDs.join()}`}
@@ -331,9 +337,10 @@ function App() {
                         <MapController selectedFeature={selectedFeature}
                                         selectedLayer={selectedLayer}
                                         setSelectedFeature={setSelectedFeature}
-                                        setSelectedLayer={setSelectedLayer} 
-                                        geoData={layers}
-                                        setVisibleFeatures={setVisibleFeatures} />
+                                        setSelectedLayer={setSelectedLayer}
+                                        setVisibleFeatures={setVisibleFeatures}
+                                        view={view}
+                                        layers={layers} />
                     </MapContainer>
                     <div style={{ position: 'absolute', bottom: '1rem', right: 0, zIndex: 1000 }}> 
                         <CollapsiblePanel hasData={layers.length > 0}>
