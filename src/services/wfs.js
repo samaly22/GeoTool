@@ -43,6 +43,8 @@ export async function fetchCapabilities(url) {
   const parser = new DOMParser()
   const xml = parser.parseFromString(text, 'application/xml')
   //console.log(xml.getElementsByTagNameNS('*', 'Operation')[0])
+  const isXml = xml.getElementsByTagNameNS('*', 'FeatureType').length > 0 || xml.getElementsByTagNameNS('*', 'WFS_Capabilities').length > 0
+  if (!isXml) throw new Error('WRONG_FORMAT')
   const featureTypes = xml.getElementsByTagNameNS('*', 'FeatureType')
   const formats = new Set()
   const formatElements = xml.getElementsByTagNameNS('*', 'Format')

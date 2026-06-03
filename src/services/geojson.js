@@ -1,6 +1,13 @@
 export async function fetchGeoJSON(url) {
     const response = await fetch(url)
-    const data = await response.json()
+    let data
+    try {
+        await response.json()
+    } catch (e) {
+        throw new Error('WRONG_FORMAT')
+    }
+
+    if (!data.features && !data.links) throw new Error('WRONG_FORMAT')
 
     if (data.features) {
         return { geojson: data, title: null }

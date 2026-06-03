@@ -26,7 +26,11 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
         onDataLoad(result.geojson, result.title ?? url, url, 'geojson')
         success = true
       } catch (e) {
-        setError('Verbindung fehlgeschlagen. Prüfe die URL.')
+        if (e.message === 'WRONG_FORMAT') {
+          setError('Diese URL scheint keine GeoJSON-Daten zu sein. Prüfe das Format.')
+        } else {
+          setError('Verbindung fehlgeschlagen. Prüfe die URL.')
+        }
       }
     } else if (activeTab === 'wfs'){
       try {
@@ -37,7 +41,11 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
         }
         success = true
       } catch (e) {
-        setError('Verbindung fehlgeschlagen. Prüfe die URL.')
+        if (e.message === 'WRONG_FORMAT') {
+          setError('Diese URL scheint kein WFS-Dienst zu sein. Prüfe das Format.')
+        } else {
+          setError('Verbindung fehlgeschlagen. Prüfe die URL.')
+        }
       }
     }
     setLoading(false)
