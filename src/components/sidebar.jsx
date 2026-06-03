@@ -18,11 +18,13 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
     setLoading(true)
     setError(null)
     //console.log(url)
+    let success = false
     if (activeTab === 'geoJSON') {
       try {
         console.log('handleLoad aufgerufen', url)
         const result = await fetchGeoJSON(url)
         onDataLoad(result.geojson, result.title ?? url, url, 'geojson')
+        success = true
       } catch (e) {
         setError('Verbindung fehlgeschlagen. Prüfe die URL.')
       }
@@ -33,11 +35,13 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
         if (result.length === 1) {
           onLayerSelect(result[0])
         }
+        success = true
       } catch (e) {
         setError('Verbindung fehlgeschlagen. Prüfe die URL.')
       }
     }
     setLoading(false)
+    if (success) setUrl('')
   }
 
   const tabStyle = (tab) => ({
