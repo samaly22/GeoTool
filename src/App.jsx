@@ -128,6 +128,16 @@ function App() {
             setSelectedFeature(null)
         }, [selectedFeature])
 
+        useEffect(() => {
+            if (view !== "map") return
+            setTimeout(() => {
+                map.invalidateSize()
+                const allFeatures = layers.flatMap(l => l.data?.features ?? [])
+                if (allFeatures.length === 0) return
+                const bounds = L.geoJSON({ type: 'FeatureCollection', features: allFeatures }).getBounds()
+                map.fitBounds(bounds, { animate: true })
+            }, 100)
+        }, [view])
     }
 
     const displayedFeatures = isFiltered
