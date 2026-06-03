@@ -129,7 +129,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.4rem 0.6rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', overflow: 'hidden' }}>
                   <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: layer.color, flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{layer.name}</span>
+                  <span style={{ fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{layer.title || layer.name}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', flexShrink: 0 }}>
                   <button className="icon-btn" onClick={() => moveLayer(layer.id, 'up')}>▲</button>
