@@ -106,8 +106,6 @@ The application is then accessible at `http://localhost:5173`.
 
 [Accessible bus stops in Dresden](https://kommisdd.dresden.de/net3/public/ogcsl.ashx?nodeid=1593&service=wfs&request=getcapabilities)
 
-Translated with DeepL.com (free version)
-
 ## Supported Data Sources
 
 **WFS (Web Feature Service)**
