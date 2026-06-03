@@ -130,13 +130,16 @@ function App() {
             setSelectedLayer(layer)
             //setMetaLayer({ ...layer, url: wfsUrl })
             const data = await fetchFeatures(wfsUrl, layer.name, layer.formats)
+            if (!data.feature || data.features.length === 0) {
+                showNotification(`Layer "${layer.title}" enthält keine Features.`, true)
+            }
             const analysis = analyzeLayer(data)
             addLayer(layer.name, layer.title, 'wfs', data, { ...layer, url: wfsUrl})
-            if (analysis.numericColumns.length > 0  && ['Polygon', 'MultiPolygon'].includes(analysis.geometryType)) {
-                showNotification(`Layer "${layer.title}" eignet sich für eine Choroplethenkarte.`)
+            if (analysis?.numericColumns?.length > 0  && ['Polygon', 'MultiPolygon'].includes(analysis.geometryType)) {
+                showNotification(`Layer "${layer.title}" eignet sich für eine Choroplethenkarte.`, false)
             }
             if (analysis?.geometryType === 'Point' || analysis?.geometryType === 'MultiPolygon') {
-                showNotification(`Layer "${layer.title}" eignet sich für eine Heatmap.`)
+                showNotification(`Layer "${layer.title}" eignet sich für eine Heatmap.`, false)
             }
             //console.log(layers)
             setVisibleFeatures(data.features)
@@ -203,9 +206,9 @@ function App() {
         return { geometryType, numericColumns }
     }
 
-    function showNotification(message) {
+    function showNotification(message, isError) {
         const id = Date.now()
-        setNotification(prev => [...(prev || []), { id, message }])
+        setNotification(prev => [...(prev || []), { id, message, isError }])
         setTimeout(() => setNotification(prev => prev.filter(n => n.id !== id)), 5000)
     }
 
@@ -260,7 +263,7 @@ function App() {
                     <>
                     <div className="notification-container">
                     {notification && notification.map(n => (
-                        <div className="notification" key={n.id}>
+                        <div className="notification" key={n.id} style={ n.isError ? { borderLeft: "10px solid #f38ba8"} : 'none'}>
                             {n.message}
                         </div>
                     ))}

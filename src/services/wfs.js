@@ -81,7 +81,7 @@ export async function fetchFeatures(url, layerName, outputFormats) {
   //const format = outputFormats.includes('application/geo+json') ? 'application/geo%2Bjson' : 'application/json'
   const format = outputFormats.values().next().value.replace('+', '%2B')
   const featureUrl = `${newUrl}${binding}SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${layerName}&outputFormat=${format}&SRSNAME=EPSG:4326&count=500`
-  
+
   //console.log(featureUrl)
   const response = await fetch(featureUrl)
   const data = await response.json()
