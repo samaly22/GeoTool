@@ -9,7 +9,7 @@ function AttributesTable({ features, handleOnClick, filterableFIDs, setFilterabl
     return (
         <div style={{
             width: '350px',
-            maxHeight: '80vh',
+            maxHeight: '75vh',
             overflowY: 'auto',
             background: 'var(--bg-sidebar)',
             border: '1px solid var(--border)',

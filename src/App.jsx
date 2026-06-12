@@ -130,7 +130,7 @@ function App() {
             setSelectedLayer(layer)
             //setMetaLayer({ ...layer, url: wfsUrl })
             const data = await fetchFeatures(wfsUrl, layer.name, layer.formats)
-            if (!data.feature || data.features.length === 0) {
+            if (!data.features || data.features.length === 0) {
                 showNotification(`Layer "${layer.title}" enthält keine Features.`, true)
             }
             const analysis = analyzeLayer(data)
@@ -207,7 +207,7 @@ function App() {
     }
 
     function showNotification(message, isError) {
-        const id = Date.now()
+        const id = `notif-${Date.now()}`
         setNotification(prev => [...(prev || []), { id, message, isError }])
         setTimeout(() => setNotification(prev => prev.filter(n => n.id !== id)), 5000)
     }
@@ -263,7 +263,7 @@ function App() {
                     <>
                     <div className="notification-container">
                     {notification && notification.map(n => (
-                        <div className="notification" key={n.id} style={ n.isError ? { borderLeft: "10px solid #f38ba8"} : 'none'}>
+                        <div className="notification" key={n.id} style={{ borderLeft: n.isError ? "10px solid #f38ba8" : 'unset'}}>
                             {n.message}
                         </div>
                     ))}
@@ -288,7 +288,9 @@ function App() {
 
                             const isHeatmap = heatmaps[layer.id]
                             const points = isHeatmap
-                                ? layer.data.features.map(f => [
+                                ? layer.data.features
+                                .filter(f => f.geometry?.coordinates)
+                                .map(f => [
                                     f.geometry.coordinates[1],
                                     f.geometry.coordinates[0]
                                 ])

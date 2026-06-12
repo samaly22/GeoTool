@@ -1,5 +1,6 @@
 {
     "dynamicTable": false,
+    "initialFeaturesSize": 500,
     "WFSnameKeys": ["Name", "name", "NAME", "bez", "bezeichnung", "title", "Title", "stadtteilname"],
     "colors": ["#e63946", "#457b9d", "#2a9d8f", "#e9c46a", "#f4a261"]
 }

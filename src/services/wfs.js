@@ -1,4 +1,5 @@
 import proj4 from 'proj4'
+import config from '../config.json'
 
 proj4.defs('EPSG:25833', '+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs')
 
@@ -80,7 +81,7 @@ export async function fetchFeatures(url, layerName, outputFormats) {
   //console.log([...outputFormats])
   //const format = outputFormats.includes('application/geo+json') ? 'application/geo%2Bjson' : 'application/json'
   const format = outputFormats.values().next().value.replace('+', '%2B')
-  const featureUrl = `${newUrl}${binding}SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${layerName}&outputFormat=${format}&SRSNAME=EPSG:4326&count=500`
+  const featureUrl = `${newUrl}${binding}SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=${layerName}&outputFormat=${format}&SRSNAME=EPSG:4326&count=${config.initialFeaturesSize}`
 
   //console.log(featureUrl)
   const response = await fetch(featureUrl)

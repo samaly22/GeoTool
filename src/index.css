@@ -144,6 +144,7 @@ td {
     padding: 0.4rem 0.5rem;
     border-bottom: 1px solid var(--border);
     color: var(--text-primary);
+    word-break: break-word;
 }
 
 tr:hover td {
