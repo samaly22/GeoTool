@@ -125,6 +125,14 @@ function App() {
         setVisibleFeatures(data.features)
         const bounds = L.geoJSON(data).getBounds()
         setSelectedLayer({ boundingBox: {lowerCorner: `${bounds.getWest()} ${bounds.getSouth()}`, upperCorner: `${bounds.getEast()} ${bounds.getNorth()}` }})
+
+        const analysis = analyzeLayer(data)
+        if (analysis?.numericColumns?.length > 0  && ['Polygon', 'MultiPolygon'].includes(analysis.geometryType)) {
+            showNotification(`Layer "${name}" eignet sich für eine Choroplethenkarte.`, false)
+        }
+        if (analysis?.geometryType === 'Point' || analysis?.geometryType === 'MultiPolygon') {
+            showNotification(`Layer "${name}" eignet sich für eine Heatmap.`, false)
+        }
     }
     
     async function handleLayerSelect(layer) {

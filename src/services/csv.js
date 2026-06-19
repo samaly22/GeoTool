@@ -3,9 +3,11 @@ import wellknown from 'wellknown'
 // Sucht im Objekt nach dem Schlüssel, der WKT-Geometriedaten (Polygon, Punkt, Linie) enthält
 function findGeometryKey(obj) {
     return Object.keys(obj).find(key => {
-        return obj[key].includes('POLYGON') ||
+        return typeof obj[key] === 'string' && (
+                obj[key].includes('POLYGON') ||
                 obj[key].includes('POINT') ||
                 obj[key].includes('LINESTRING')
+        )
     })
 }
 
@@ -28,7 +30,8 @@ export async function readCSV(file) {
                 const values = r.split(/;(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/"/g, ''))
                 const obj = {}
                 headers.forEach((h, i) => {
-                    obj[h] = values[i]
+                    const val = values[i]
+                    obj[h] = isNaN(val) || val === '' ? val : Number(val)
                 });
 
                 // Identifiziert die Spalte mit Geometriedaten; bricht ab, falls keine existiert
