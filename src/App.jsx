@@ -10,6 +10,7 @@ import TableView from './components/tableView.jsx'
 import HeatmapLayer from './components/heatmapLayer.jsx'
 import config from './config.json'
 
+// Steuert Karteninteraktionen: Zoom bei Layer- oder Feature-Auswahl, Neubrechnung sichtbarer Features bei Kartenbewegung und Anpassung der Kartengröße beim Ansichtwechsel.
 function MapController({ selectedFeature, selectedLayer, setSelectedFeature, setSelectedLayer, setVisibleFeatures, view, layers }) {
     const map = useMap()
     const hasZoomed = useRef(false)
@@ -33,7 +34,7 @@ function MapController({ selectedFeature, selectedLayer, setSelectedFeature, set
         const upper = selectedLayer.boundingBox.upperCorner.split(' ')
         map.fitBounds([[lower[1], lower[0]], [upper[1], upper[0]]], { animate: true, duration: 2 })
         setTimeout(() => map.invalidateSize(), 30000)
-        console.log('lower:', lower, 'upper:', upper)
+        //console.log('lower:', lower, 'upper:', upper)
         setSelectedLayer(null)
     }, [selectedLayer])
     
@@ -52,6 +53,7 @@ function MapController({ selectedFeature, selectedLayer, setSelectedFeature, set
         setSelectedFeature(null)
     }, [selectedFeature])
 
+    // Zoomen bei Ansichtwechsel
     useEffect(() => {
         if (view !== "map") {
             hasZoomed.current = false
@@ -69,7 +71,7 @@ function MapController({ selectedFeature, selectedLayer, setSelectedFeature, set
     }, [view])
 }
 
-
+// Hauptkomponente der Anwendung. Verwaltet den globalen Zusatnd (Layer, Filter, Ansicht) und koordiniert das Zusammenspiel zwischen Sidebar, Karte und Tabelle.
 function App() {
     const [hoveredFeature, setHoveredFeature] = useState(null)
     const [selectedFeature, setSelectedFeature] = useState(null)
@@ -364,20 +366,6 @@ function App() {
 
         </div>    
     )
-    
-//  nur Leaflet Karte anzeigen
-//   return (
-//     <MapContainer
-//       center={[51.505, -0.09]}
-//       zoom={13}
-//       style={{ height: '100vh', width: '100%' }}
-//     >
-//       <TileLayer
-//         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-//         attribution="© OpenStreetMap contributors"
-//       />
-//     </MapContainer>
-//   )
 }
 
 export default App

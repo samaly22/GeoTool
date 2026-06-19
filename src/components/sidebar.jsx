@@ -4,6 +4,7 @@ import { fetchGeoJSON } from '../services/geojson.js'
 import MetaData from './metaData.jsx'
 import { readCSV } from '../services/csv.js'
 
+// Verwaltet die Seitenleiste zum Laden von WFS, GeoJSON und CSV sowie zur Layer-Steuerung
 function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, activeLayers, removeLayer, updateColor, choropleths, setChoropleth, heatmaps, toggleHeatmap, moveLayer }) {
   const [url, setUrl] = useState('')
   const [layers, setLayers] = useState([])
@@ -21,7 +22,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
     let success = false
     if (activeTab === 'geoJSON') {
       try {
-        console.log('handleLoad aufgerufen', url)
+        //console.log('handleLoad aufgerufen', url)
         const result = await fetchGeoJSON(url)
         onDataLoad(result.geojson, result.title ?? url, url, 'geojson')
         success = true
@@ -77,12 +78,14 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
             GeoDataExplorer
           </h2>
 
+          {/* Tab-Navigation für die drei unterstützten Datenquellen */}
           <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: '0.75rem'}}>
             <button style={tabStyle('wfs')} onClick={() => { setActiveTab('wfs'); setUrl('') }}>WFS</button>
             <button style={tabStyle('geoJSON')} onClick={() => { setActiveTab('geoJSON'); setUrl('') }}>GeoJSON</button>
             <button style={tabStyle('csv')} onClick={() => setActiveTab('csv')}>CSV</button>
           </div>
 
+      {/* Laden für Netzwerk-URLs (WFS /  GeoJSON) */}
       {(activeTab === 'wfs'  || activeTab === 'geoJSON') && (
         <div>
           <input
@@ -101,6 +104,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
       </div>
       )}
 
+      {/* Laden von CSV-Dateien */}
       {activeTab === 'csv' &&
       <div>
         <input type="file" accept=".csv" onChange={async (e) => {
@@ -119,6 +123,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
       </div> 
       }
 
+      {/* Anzeige aller auf der Karte geladenen Layer */}
       {activeLayers.length > 0 && (
         <div style={{ marginBottom: '1rem'}}>
           <div onClick={() => setShowActiveLayers(p => !p)} style={{
@@ -180,6 +185,7 @@ function Sidebar({ onLayerSelect, onUrlChange, selectedLayer, onDataLoad, active
         </div>
       )}
 
+      {/* Anzeige aller Layer der zuletzt geladenen WFS-Datei */}
       {layers.length > 0 &&
         <div>
           <div onClick={() => setShowAllLayers(p => !p)} style={{

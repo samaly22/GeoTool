@@ -3,6 +3,7 @@ import { useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet.heat'
 
+// Rendert die Heatmap
 function HeatmapLayer({ points }) {
     const map =  useMap()
 

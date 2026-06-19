@@ -1,3 +1,4 @@
+// Rendert deatilierte Metadaten-Tabellen für einen ausgewählten Layer
 function MetaData ({ layer }) {
     if (!layer) return null
 

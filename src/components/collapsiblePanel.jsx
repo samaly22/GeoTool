@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+// Rendert ein ein- und ausklappbares Panel für untergeordnete Elemente (Children)
 function CollapsiblePanel ({ children, hasData }) {
     const [isOpen, setIsOpen] = useState(false)
 
@@ -13,7 +14,6 @@ function CollapsiblePanel ({ children, hasData }) {
                 padding: '1rem 0.5rem',
                 background: 'var(--button-bg)',
                 color: 'var(--text-primary)',
-                cursor: 'pointer',
                 borderRadius: '6px 0 0 0',
                 cursor: hasData ? 'pointer' : 'default',
                 opacity: hasData ? 1 : 0.6 }}

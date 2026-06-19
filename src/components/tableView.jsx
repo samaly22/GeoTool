@@ -15,6 +15,8 @@ function TableView({ layers, activeTableLayer, setActiveTableLayer }) {
     const currentLayer = layers.find(l => l.id === activeTableLayer) ?? layers[0]
     const features = currentLayer.data.features
     const columns = features.length > 0 ? Object.keys(features[0].properties) : []
+
+    // Sortiert die Features basierend auf dem ausgewählten Schlüssel und der Sortierrichtung
     const sorted = [...features].sort((a, b) => {
         if (!sortKey) return 0
         const valA = a.properties[sortKey]
@@ -24,6 +26,7 @@ function TableView({ layers, activeTableLayer, setActiveTableLayer }) {
         return 0
     })
 
+    // Steuert die Sortierlogik 
     function handleSort(key) {
         if (sortKey === key) {
             setSortDir(prev => prev === 'asc' ? 'desc' : 'asc')
@@ -35,6 +38,7 @@ function TableView({ layers, activeTableLayer, setActiveTableLayer }) {
 
     return (
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg-sidebar)' }}>
+            {/* Tableiste zum Umschalten zwischen den verschiedenen geladenen Layern */}
             <div style={{ display: 'flex', borderBottom: '1px solid var(--border)' }}>
                 {layers.map(layer => (
                     <button
@@ -50,10 +54,13 @@ function TableView({ layers, activeTableLayer, setActiveTableLayer }) {
                     </button>    
                 ))}
             </div>
+
+            {/* Scrollbarere Container für die Datentabelle */}
             <div style={{overflowY: 'auto', flex: 1, padding: '0.5rem'}}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                         <tr>
+                            {/* Tabellenkopf mit Spaltennamen und klickbaren Sortier-Indikatoren */}
                             {columns.map(col => (
                                 <th key={col} onClick={() => handleSort(col)} style={{ cursor: 'pointer' }}>
                                     {col} {sortKey === col ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
@@ -62,6 +69,7 @@ function TableView({ layers, activeTableLayer, setActiveTableLayer }) {
                         </tr>
                     </thead>
                     <tbody>
+                        {/* Anzeige der Features in Zeilen (Rausfiltern HTML-Strings) */}
                         {sorted.map((feature, index) => (
                             <tr key={index}>
                                 {columns.map(col => (

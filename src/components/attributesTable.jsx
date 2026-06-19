@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+// Zeigt eine filterbare und selktiertbare Liste von GeoJSON-Features mit deren Attributen in Tabellenform.
+// Einzelne Features können per Checkbox markiert und anschließend als Kartenfilter gesetzt werden.
 function AttributesTable({ features, handleOnClick, filterableFIDs, setFilterableFIDs, isFiltered, setIsFiltered, change, selectAll }) {
 
     if (!features) {
@@ -18,7 +20,7 @@ function AttributesTable({ features, handleOnClick, filterableFIDs, setFilterabl
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <input type="checkbox"
-                        checked={(filterableFIDs.length == features.length)} // Kontrolliert den Zustand
+                        checked={(filterableFIDs.length === features.length)} // Kontrolliert den Zustand
                         onChange={(e) => selectAll()} // Behandelt Änderungen
                     />
                     <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Alle</span>
@@ -30,7 +32,7 @@ function AttributesTable({ features, handleOnClick, filterableFIDs, setFilterabl
             {features.map((feature, index) =>
                 <div key={index}
                     onClick={() => {
-                        console.log('Klick')
+                        //console.log('Klick')
                         handleOnClick(feature)}}
                     style={{marginBottom: '0.75rem',
                             padding: '0.75rem',
